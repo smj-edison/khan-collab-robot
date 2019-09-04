@@ -38,4 +38,9 @@ function mergeCookies(oldCookies, newCookies) {
     return cookiesArray;
 }
 
-export {cookiesToCookieString, getCookieValue, cookieToKeyValue, mergeCookies};
+module.exports = {
+    cookiesToCookieString,
+    getCookieValue,
+    cookieToKeyValue,
+    mergeCookies
+};
