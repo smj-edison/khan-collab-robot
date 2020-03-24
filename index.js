@@ -1,10 +1,7 @@
 "use strict"
 
-const axios = require("axios");
-const cookieHelper = require("./cookies.js");
-const {getSessionCookies, login} = require("./session.js");
+const {login} = require("./session");
 const {updateProgram} = require("./programs");
-const {commentAtRoot} = require("./comments");
 
 let username = process.env.USERNAME;
 let password = process.env.PASSWORD;
