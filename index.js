@@ -10,25 +10,7 @@ const PROGRAM_DEFAULT_JSON = require("./constants").PROGRAM_SAVE_JSON_DEFAULT;
 
 //some functions I created to work with cookie headers, because axios wasn't doing its job
 let cookieHelper = require("./cookies.js");
-
-//load khanacademy.org and return a list of all the cookies
-function getSessionCookies() {
-    return axios.get("https://khanacademy.org").then((result) => {
-        return result.headers["set-cookie"];
-    }, {withCredentials: true});
-}
-
-//logs in a user, based on their username, password, and the cookies from `getSessionCookies()`
-async function login(username, password, cookies) {
-    return axios.post("https://www.khanacademy.org/login", qs.stringify({
-        "identifier": username,
-        "password": password,
-        "fkey": cookieHelper.getCookieValue(cookies, "fkey"),
-        "continue": "/"
-    }), { withCredentials: true }).then((result) => {
-        return result.headers["set-cookie"];
-    });
-}
+const {getSessionCookies, login} = require("./session.js");
 
 //returns the parsed program JSON from the API
 async function getProgramJSON(id) {
