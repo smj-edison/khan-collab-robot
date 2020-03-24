@@ -11,9 +11,10 @@ let _ = (async function() {
     let cookies = await login(username, password);
     console.log("logged in!");
 
-    updateProgram(cookies, process.env.TEST_PROGRAM, "//test!").then(results => {
-        console.log("Got results!", results);
-    }).catch(err => {
-        console.log("Error in changing program: ", err);
-    });
+    updateProgram(cookies, process.env.TEST_PROGRAM, "//test!")
+        .then(results => {
+            console.log("Got results!", results);
+        }).catch(err => {
+            console.log("Error in changing program: ", err);
+        });
 })();
