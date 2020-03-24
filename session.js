@@ -71,6 +71,8 @@ async function login(username, password) {
 }
 
 module.exports = {
+    makeGetRequest,
+    makePostRequest,
     getSessionCookies,
     login
 };
