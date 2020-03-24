@@ -1,5 +1,6 @@
 const axios = require("axios");
 const qs = require("qs");
+const cookieHelper = require("./cookies.js");
 const {cookiesToCookieString, getCookieValue} = require("./cookies");
 
 /**
@@ -50,7 +51,7 @@ function getSessionCookies() {
  * logs in a user, based on their username, password, and the cookies from `getSessionCookies()`
  * @returns an array of set-cookie headers from the server
 **/
-async function login(username, password, cookies) {
+async function loginWithCookies(username, password, cookies) {
     return axios.post("https://www.khanacademy.org/login", qs.stringify({
         "identifier": username,
         "password": password,
@@ -59,6 +60,14 @@ async function login(username, password, cookies) {
     }), { withCredentials: true }).then((result) => {
         return result.headers["set-cookie"];
     });
+}
+
+async function login(username, password) {
+    let sessionCookies = await getSessionCookies();
+    let loginCookies = await login(username, password, sessionCookies);
+    let cookies = cookieHelper.mergeCookies(sessionCookies, loginCookies);
+
+    return cookies;
 }
 
 module.exports = {

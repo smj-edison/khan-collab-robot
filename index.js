@@ -11,13 +11,7 @@ let password = process.env.PASSWORD;
 
 //capture results so that they aren't printed to the console
 let _ = (async function() {
-    let sessionCookies = await getSessionCookies();
-    console.log("got session cookies!");
-
-    let loginCookies = await login(username, password, sessionCookies);
-
-    let cookies = cookieHelper.mergeCookies(sessionCookies, loginCookies);
-
+    let cookies = await login(username, password);
     console.log("logged in!");
 
     updateProgram(cookies, process.env.TEST_PROGRAM, "pjs", "//updated from node!").then(results => {
