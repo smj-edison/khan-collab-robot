@@ -64,7 +64,7 @@ async function loginWithCookies(username, password, cookies) {
 
 async function login(username, password) {
     let sessionCookies = await getSessionCookies();
-    let loginCookies = await login(username, password, sessionCookies);
+    let loginCookies = await loginWithCookies(username, password, sessionCookies);
     let cookies = cookieHelper.mergeCookies(sessionCookies, loginCookies);
 
     return cookies;
