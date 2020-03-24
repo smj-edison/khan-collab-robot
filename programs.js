@@ -1,5 +1,5 @@
 const axios = require("axios");
-const {makePostRequest} = require("./session");
+const {makePutRequest} = require("./session");
 const PROGRAM_DEFAULT_JSON = require("./constants").PROGRAM_SAVE_JSON_DEFAULT;
 
 /**
@@ -56,7 +56,7 @@ async function updateProgram(cookies, programId, code, settings={}) {
 
     let url = `https://www.khanacademy.org/api/internal/scratchpads/${programId}?client_dt=${getQueryTime()}&lang=en`;
     
-    return makePostRequest(url, jsonToSend, cookies);
+    return makePutRequest(url, jsonToSend, cookies);
 }
 
 module.exports = {
