@@ -3,6 +3,21 @@ const qs = require("qs");
 const {cookiesToCookieString, getCookieValue} = require("./cookies");
 
 /**
+ * Make a GET request with the proper authentication on Khan Academy
+ * 
+ * @param {string} url The url on Khan Academy to make the GET request
+ * @param {Array} cookies A list of cookies returned from a axios's request (set-cookie header)
+ */
+async function makeGetRequest(url, cookies) {
+    return axios.get(url, {
+        "headers": {
+            "Cookie": cookiesToCookieString(cookies),
+            "X-KA-FKey": getCookieValue(cookies, "fkey")
+        }
+    });
+}
+
+/**
  * Make a POST request with the proper authentication on Khan Academy
  * 
  * @param {string} url The url on Khan Academy to make the POST request
