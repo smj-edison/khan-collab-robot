@@ -27,7 +27,7 @@ async function makeGetRequest(url, cookies) {
  */
 async function makePostRequest(url, body, cookies) {
     if(typeof body === "object") {
-        body = JSON.serialize(body);
+        body = JSON.stringify(body);
     }
 
     return axios.post(url, body, {
