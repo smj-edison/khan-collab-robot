@@ -38,9 +38,19 @@ function mergeCookies(oldCookies, newCookies) {
     return cookiesArray;
 }
 
+//create a configuration for axios requests with all the `cookies` provided
+function genCookieHeader(cookies) {
+    return {
+        headers: {
+            Cookie: cookieHelper.cookiesToCookieString(cookies)
+        }
+    }
+}
+
 module.exports = {
     cookiesToCookieString,
     getCookieValue,
     cookieToKeyValue,
-    mergeCookies
+    mergeCookies,
+    genCookieHeader
 };

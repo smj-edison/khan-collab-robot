@@ -11,15 +11,6 @@ const PROGRAM_DEFAULT_JSON = require("./constants").PROGRAM_SAVE_JSON_DEFAULT;
 //some functions I created to work with cookie headers, because axios wasn't doing its job
 let cookieHelper = require("./cookies.js");
 
-//create a configuration for axios requests with all the `cookies` provided
-function genCookieHeader(cookies) {
-    return {
-        headers: {
-            Cookie: cookieHelper.cookiesToCookieString(cookies)
-        }
-    }
-}
-
 //load khanacademy.org and return a list of all the cookies
 function getSessionCookies() {
     return axios.get("https://khanacademy.org").then((result) => {
@@ -113,7 +104,7 @@ let _ = (async function() {
     let cookies = cookieHelper.mergeCookies(sessionCookies, loginCookies);
 
     //check that you are logged in
-    console.assert((await axios.get("https://khanacademy.org", genCookieHeader(cookies))).data.indexOf(username) >= 0,
+    console.assert((await axios.get("https://khanacademy.org", cookieHelper.genCookieHeader(cookies))).data.indexOf(username) >= 0,
         {errorMsg: "Not logged in correctly! When opening up khanacademy.org, it shows default page"});
 
     console.log("logged in!");
