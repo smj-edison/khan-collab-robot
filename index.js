@@ -4,22 +4,7 @@ const axios = require("axios");
 const cookieHelper = require("./cookies.js");
 const {getSessionCookies, login} = require("./session.js");
 const {updateProgram} = require("./programs");
-
-async function commentAtRoot(commentURL, text, cookies) {
-    var commentJSON = {
-        "fromVideoAuthor": false,
-        "shownLowQualityNotice": false,
-        "text": text,
-        "topic_slug": "computer-programming"
-    }
-
-    axios.post(commentURL + `?casing=camel&lang=en&_=190828-1155-f259d8dcd107_${Date.now()}`, commentJSON, {
-        headers: {
-            Cookie: cookieHelper.cookiesToCookieString(cookies),
-            "X-KA-FKey": cookieHelper.getCookieValue(cookies, "fkey")
-        }
-    });
-};
+const {commentAtRoot} = require("./comments");
 
 let username = process.env.USERNAME;
 let password = process.env.PASSWORD;
