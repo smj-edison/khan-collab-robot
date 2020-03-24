@@ -19,6 +19,8 @@ async function getSessionCookies(username, password) {
 
         passwordBox.sendKeys(Key.RETURN);
 
+        await sleep(12000);
+
         return await driver.manage().getCookies();
     } finally {
         await driver.quit();

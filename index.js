@@ -78,11 +78,7 @@ async function commentAtRoot(commentURL, text, cookies) {
         "topic_slug": "computer-programming"
     }
 
-    axios.post(commentURL + `?casing=camel&lang=en&_=190828-1155-f259d8dcd107_${Date.now()}`, commentJSON, {
-        headers: {
-            Cookie: cookieHelper.cookiesToCookieString(cookies)
-        }
-    });
+    axios.post(commentURL + `?casing=camel&lang=en&_=190828-1155-f259d8dcd107_${Date.now()}`, commentJSON, genCookieHeader(cookies));
 };
 
 let username = process.env.USERNAME;
@@ -93,7 +89,7 @@ let _ = (async function() {
     let loginCookies = await getSessionCookies(username, password);
 
     //check that you are logged in
-    console.assert((await axios.get("https://khanacademy.org", genCookieHeader(cookies))).data.indexOf(username) >= 0,
+    console.assert((await axios.get("https://khanacademy.org/profile", genCookieHeader(cookies))).data.indexOf(username) >= 0,
         {errorMsg: "Not logged in correctly! When opening up khanacademy.org, it shows default page"});
 
     console.log("logged in!");
