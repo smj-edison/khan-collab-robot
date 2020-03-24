@@ -1,5 +1,26 @@
 const axios = require("axios");
 const qs = require("qs");
+const {cookiesToCookieString, getCookieValue} = require("./cookies");
+
+/**
+ * Make a POST request with the proper authentication on Khan Academy
+ * 
+ * @param {string} url The url on Khan Academy to make the POST request
+ * @param {string|object} body The body of the POST request
+ * @param {Array} cookies A list of cookies returned from a axios's request (set-cookie header)
+ */
+async function makePostRequest(url, body, cookies) {
+    if(typeof body === "object") {
+        body = JSON.serialize(body);
+    }
+
+    return axios.post(url, body, {
+        "headers": {
+            "Cookie": cookiesToCookieString(cookies),
+            "X-KA-FKey": getCookieValue(cookies, "fkey")
+        }
+    });
+}
 
 /**
  * Load khanacademy.org and return a list of all the cookies
