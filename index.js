@@ -11,7 +11,7 @@ let _ = (async function() {
     let cookies = await login(username, password);
     console.log("logged in!");
 
-    updateProgram(cookies, process.env.TEST_PROGRAM, "pjs", "//updated from node!").then(results => {
+    updateProgram(cookies, process.env.TEST_PROGRAM, "pjs", "//test!").then(results => {
         console.log("Got results!", results);
     }).catch(err => {
         console.log("Error in changing program: ", err);
