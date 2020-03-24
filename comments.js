@@ -13,6 +13,14 @@ async function commentAtRoot(programId, text, cookies) {
     makePostRequest(url, commentJSON, cookies);
 };
 
+async function getProgramComments(programId) {
+    let url = `https://www.khanacademy.org/api/internal/discussions/scratchpad/${programId}/comments?casing=camel&limit=1000000&page=0&sort=1&lang=en`;
+    
+    return axios.get(url).then(response => {
+        return response.data;
+    });
+}
+
 module.exports = {
     commentAtRoot
 };
