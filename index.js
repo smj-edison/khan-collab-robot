@@ -1,16 +1,9 @@
 "use strict"
 
-//qs is for generating POST request bodies
-let qs = require("qs");
-//axios is what makes all the requests
-let axios = require("axios");
-
-//the JSON that is in all program requests
-const PROGRAM_DEFAULT_JSON = require("./constants").PROGRAM_SAVE_JSON_DEFAULT;
-
-//some functions I created to work with cookie headers, because axios wasn't doing its job
-let cookieHelper = require("./cookies.js");
+const axios = require("axios");
+const cookieHelper = require("./cookies.js");
 const {getSessionCookies, login} = require("./session.js");
+const PROGRAM_DEFAULT_JSON = require("./constants").PROGRAM_SAVE_JSON_DEFAULT;
 
 //returns the parsed program JSON from the API
 async function getProgramJSON(id) {
