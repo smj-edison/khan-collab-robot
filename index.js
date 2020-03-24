@@ -18,10 +18,6 @@ let _ = (async function() {
 
     let cookies = cookieHelper.mergeCookies(sessionCookies, loginCookies);
 
-    //check that you are logged in
-    console.assert((await axios.get("https://khanacademy.org", cookieHelper.genCookieHeader(cookies))).data.indexOf(username) >= 0,
-        {errorMsg: "Not logged in correctly! When opening up khanacademy.org, it shows default page"});
-
     console.log("logged in!");
 
     updateProgram(cookies, process.env.TEST_PROGRAM, "pjs", "//updated from node!").then(results => {
