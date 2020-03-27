@@ -1,18 +1,17 @@
-let test = require("./commands/test");
+const test = require("./commands/test");
 
-var routes = {
+const routes = {
     "test": test
 };
 
-function run_command(text) {
+async function runCommand(text, kaid) {
     // TODO: parse commands better
-    var args = text.split(" ");
+    let args = text.split(" ");
+    let command = args.splice(0, 1)[0];
 
-    var command = args.splice(0, 1);
-
-    routes[command](args);
+    return routes[command](args, kaid);
 }
 
 module.exports = {
-    run_command
+    runCommand
 };
