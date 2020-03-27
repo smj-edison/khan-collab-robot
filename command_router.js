@@ -9,6 +9,10 @@ async function runCommand(text, kaid) {
     let args = text.split(" ");
     let command = args.splice(0, 1)[0];
 
+    if(!(command in routes)) {
+        return `The command ${command} does not exist.`;
+    }
+
     return routes[command](args, kaid);
 }
 
