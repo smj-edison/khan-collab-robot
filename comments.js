@@ -21,6 +21,14 @@ async function getProgramComments(programId) {
     });
 }
 
+async function getCommentsOnComment(commentId) {
+    let url = `https://www.khanacademy.org/api/internal/discussions/${commentId}/replies?casing=camel&lang=en`;
+    
+    return axios.get(url).then(response => {
+        return response.data;
+    });
+}
+
 module.exports = {
     commentAtRoot
 };
