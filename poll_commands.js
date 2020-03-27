@@ -16,11 +16,13 @@ async function pollCommands(commentId, lastComment, cookies) {
     // get rid of comments by the bot
     allComments = allComments.filter(comment => {
         return comment.authorKaid != process.env.BOT_KAID;
-    });
+    }); 
 
     for(let i = 0; i < allComments.length; i++) {
         let text = allComments[i].content;
         let kaid = allComments[i].authorKaid;
+
+        lastComment = allComments[i].key;
         
         runCommand(text, kaid).then((function(response) {
             commentOnComment(this.commentId, response, cookies);
@@ -28,6 +30,8 @@ async function pollCommands(commentId, lastComment, cookies) {
             commentId: commentId
         }));
     }
+    
+    return lastComment;
 }
 
 module.exports = {
