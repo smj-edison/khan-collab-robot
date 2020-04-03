@@ -1,3 +1,9 @@
+/**
+ * This is a model that routes incoming command requests
+ * 
+ * Given the command text, it will route it to the appropiate function, and return a promise 
+ */
+
 const test = require("./commands/test");
 
 const routes = {
