@@ -5,12 +5,14 @@
  */
 
 const test = require("./commands/test");
+const createprogram = require("./commands/createprogram");
 
 const routes = {
-    "test": test
+    "test": test,
+    "createprogram": createprogram
 };
 
-async function runCommand(text, kaid) {
+async function runCommand(text, kaid, cookies) {
     // TODO: parse commands better
     let args = text.split(" ");
     let command = args.splice(0, 1)[0];
@@ -19,7 +21,7 @@ async function runCommand(text, kaid) {
         return `The command ${command} does not exist.`;
     }
 
-    return routes[command](args, kaid);
+    return routes[command](args, kaid, cookies);
 }
 
 module.exports = {

@@ -60,7 +60,7 @@ async function pollCommands(commentId, dbSession, cookies) {
 
         newLastComment = allComments[i].key;
         
-        runCommand(text, kaid).then((function(response) {
+        runCommand(text, kaid, cookies).then((function(response) {
             commentOnComment(this.commentId, response, cookies);
         }).bind({
             commentId: commentId
