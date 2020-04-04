@@ -2,6 +2,7 @@
 
 const {login} = require("./session");
 const {updateProgram} = require("./programs");
+const {pollCommands} = require("./poll_commands");
 
 let username = process.env.USERNAME;
 let password = process.env.PASSWORD;
@@ -9,12 +10,13 @@ let password = process.env.PASSWORD;
 //capture results so that they aren't printed to the console
 let _ = (async function() {
     let cookies = await login(username, password);
-    console.log("logged in!");
+    let lastComment = "";
 
-    updateProgram(cookies, process.env.TEST_PROGRAM, "//test!")
-        .then(results => {
-            console.log("Got results!", results);
-        }).catch(err => {
-            console.log("Error in changing program: ", err);
+    setInterval(() => {
+        console.log("checking for new posts");
+        // TODO: crappy job here
+        pollCommands(process.env.COMMAND_COMMENT, lastComment, cookies).then(last_comment => {
+            lastComment = last_comment;
         });
+    }, 1000 * 10);
 })();
