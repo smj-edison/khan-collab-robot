@@ -3,7 +3,7 @@ const {runCommand} = require("./command_router");
 
 async function getLastComment(dbSession) {
     // find the node Poller that points to the node Comment, and return the comment
-    const result = await conn.run('MATCH (:Poller)-[:LAST_COMMENT]->(comment:Comment) RETURN comment');
+    const result = await dbSession.run('MATCH (:Poller)-[:LAST_COMMENT]->(comment:Comment) RETURN comment');
 
     // if there is a comment
     if(result.records.length > 0) {
@@ -11,6 +11,25 @@ async function getLastComment(dbSession) {
     } else {
         // else return no comment
         return "";
+    }
+}
+
+async function setLastComment(dbSession, value) {
+    // check if the node exists
+    if(await getLastComment(dbSession)) {
+        const result = await dbSession.run(`MATCH (:Poller)-[:LAST_COMMENT]->(comment:Comment)
+                                            SET comment.comment_id = $comment_id`,
+                                           {
+                                               "comment_id": value
+                                           });
+    } else {
+        // else create it
+        const result = await dbSession.run(`CREATE (p:Poller)
+                                            CREATE (c:Comment { comment_id: $comment_id })
+                                            CREATE (p)-[:LAST_COMMENT]->(c)`,
+                                           {
+                                               "comment_id": value
+                                           });
     }
 }
 
