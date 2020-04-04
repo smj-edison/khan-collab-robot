@@ -33,7 +33,9 @@ async function setLastComment(dbSession, value) {
     }
 }
 
-async function pollCommands(commentId, lastComment, cookies) {
+async function pollCommands(commentId, dbSession, cookies) {
+    const lastComment = await getLastComment(dbSession);
+
     let allComments = await getCommentsOnComment(commentId);
 
     let lastCommandExecutedIndex = allComments.findIndex(comment => {
@@ -50,11 +52,13 @@ async function pollCommands(commentId, lastComment, cookies) {
         return comment.authorKaid != process.env.BOT_KAID;
     }); 
 
+    let newLastComment = lastComment;
+
     for(let i = 0; i < allComments.length; i++) {
         let text = allComments[i].content;
         let kaid = allComments[i].authorKaid;
 
-        lastComment = allComments[i].key;
+        newLastComment = allComments[i].key;
         
         runCommand(text, kaid).then((function(response) {
             commentOnComment(this.commentId, response, cookies);
@@ -63,7 +67,7 @@ async function pollCommands(commentId, lastComment, cookies) {
         }));
     }
     
-    return lastComment;
+    await setLastComment(dbSession, newLastComment);
 }
 
 module.exports = {
