@@ -1,6 +1,19 @@
 const {getCommentsOnComment, commentOnComment} = require("./comments");
 const {runCommand} = require("./command_router");
 
+async function getLastComment(dbSession) {
+    // find the node Poller that points to the node Comment, and return the comment
+    const result = await conn.run('MATCH (:Poller)-[:LAST_COMMENT]->(comment:Comment) RETURN comment');
+
+    // if there is a comment
+    if(result.records.length > 0) {
+        return result.records[0].get(0).properties.comment_id;
+    } else {
+        // else return no comment
+        return "";
+    }
+}
+
 async function pollCommands(commentId, lastComment, cookies) {
     let allComments = await getCommentsOnComment(commentId);
 
