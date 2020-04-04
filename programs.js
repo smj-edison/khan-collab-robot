@@ -1,5 +1,5 @@
 const axios = require("axios");
-const {makePutRequest} = require("./session");
+const {makePutRequest, makePostRequest} = require("./session");
 const PROGRAM_DEFAULT_JSON = require("./constants").PROGRAM_SAVE_JSON_DEFAULT;
 
 /**
@@ -59,7 +59,34 @@ async function updateProgram(cookies, programId, code, settings={}) {
     return makePutRequest(url, jsonToSend, cookies);
 }
 
+async function newProgram(cookies, code, settings={revision: {}}) {
+    let jsonToSend = {
+        title: "New program",
+        translatedTitle: "New program",
+        category: null,
+        difficulty: null,
+        tags: [],
+        userAuthoredContentType: "pjs",
+        topicId: "xffde7c31",
+        revision: {
+            code: code || "",
+            editor_type: "ace_pjs",
+            folds: [],
+            image_url: PROGRAM_DEFAULT_JSON.revision.image_url,
+            config_version: 4,
+            topic_slug: "computer-programming",
+            ...settings.revision
+        },
+        ...settings
+    };
+
+    let url = `https://www.khanacademy.org/api/internal/scratchpads?client_dt=${getQueryTime()}&lang=en`;
+
+    return makePostRequest(url, jsonToSend, cookies);
+}
+
 module.exports = {
     getProgramJSON,
-    updateProgram
+    updateProgram,
+    newProgram
 };
