@@ -11,7 +11,9 @@ let password = process.env.PASSWORD;
 //capture results so that they aren't printed to the console
 let _ = (async function() {
     let dbSession = await connect();
+    console.log("connected to database");
     let cookies = await login(username, password);
+    console.log("logged in");
     let lastComment = "";
 
     setInterval(() => {
