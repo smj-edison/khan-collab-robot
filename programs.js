@@ -59,7 +59,7 @@ async function updateProgram(cookies, programId, code, settings={}) {
     return makePutRequest(url, jsonToSend, cookies);
 }
 
-async function newProgram(cookies, code, settings={revision: {}}) {
+async function newProgram(cookies, code, settings={}) {
     let jsonToSend = {
         title: "New program",
         translatedTitle: "New program",
@@ -74,8 +74,7 @@ async function newProgram(cookies, code, settings={revision: {}}) {
             folds: [],
             image_url: PROGRAM_DEFAULT_JSON.revision.image_url,
             config_version: 4,
-            topic_slug: "computer-programming",
-            ...settings.revision
+            topic_slug: "computer-programming"
         },
         ...settings
     };
