@@ -36,6 +36,10 @@ function parseProgramHeaders(code) {
     return headers;
 }
 
+function stripProgramHeaders(code) {
+    return code.substring(code.indexOf(PROGRAM_HEADER_END_STRING) + PROGRAM_HEADER_END_STRING.length);
+}
+
 function generateProgramHeaders(headers) {
     return Object.entries(headers).reduce((str, [key, value]) => {
         return str + `//${key}: ${encodeURIComponent(value)}\n`;
