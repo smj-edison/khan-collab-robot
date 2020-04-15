@@ -14,7 +14,11 @@ let _ = (async function() {
     console.log("connected to database");
     let cookies = await login(username, password);
     console.log("logged in");
-    let lastComment = "";
+
+    console.log("checking for new posts");
+
+    // TODO: crappy job here
+    pollCommands(process.env.COMMAND_COMMENT, dbSession, cookies);
 
     setInterval(() => {
         console.log("checking for new posts");
