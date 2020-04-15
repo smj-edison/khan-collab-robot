@@ -6,10 +6,12 @@
 
 const test = require("./commands/test");
 const createprogram = require("./commands/createprogram");
+const merge = require("./commands/merge");
 
 const routes = {
     "test": test,
-    "createprogram": createprogram
+    "createprogram": createprogram,
+    "merge": merge
 };
 
 async function runCommand(text, kaid, cookies) {
