@@ -47,5 +47,7 @@ function generateProgramHeaders(headers) {
 }
 
 module.exports = {
-    parseProgramHeaders
+    parseProgramHeaders,
+    generateProgramHeaders,
+    stripProgramHeaders
 };
