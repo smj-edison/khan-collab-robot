@@ -1,4 +1,4 @@
-const {PROGRAM_HEADER_END_STRING} = require("./constants")
+const {PROGRAM_HEADER_END_STRING} = require("./constants");
 
 function parseProgramHeaders(code) {
     const endOfHeaders = code.indexOf(PROGRAM_HEADER_END_STRING);
@@ -25,7 +25,7 @@ function parseProgramHeaders(code) {
             const keyValue = keyValueString.split(":");
 
             const key = keyValue[0].trim();
-            const value = keyValue[1].trim();
+            const value = decodeURIComponent(keyValue[1].trim());
 
             headers[key] = value;
         }
@@ -34,6 +34,12 @@ function parseProgramHeaders(code) {
     });
 
     return headers;
+}
+
+function generateProgramHeaders(headers) {
+    return Object.entries(headers).reduce((str, [key, value]) => {
+        return str + `//${key}: ${encodeURIComponent(value)}\n`;
+    }, "") + PROGRAM_HEADER_END_STRING;
 }
 
 module.exports = {
