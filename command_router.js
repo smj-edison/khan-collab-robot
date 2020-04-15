@@ -7,11 +7,13 @@
 const test = require("./commands/test");
 const createprogram = require("./commands/createprogram");
 const merge = require("./commands/merge");
+const contrib = require("./commands/contrib");
 
 const routes = {
-    "test": test,
-    "createprogram": createprogram,
-    "merge": merge
+    test,
+    createprogram,
+    merge,
+    contrib
 };
 
 async function runCommand(text, kaid, cookies) {
