@@ -4,6 +4,8 @@ const PROGRAM_TYPE = Object.freeze({
     "sql": "sql"
 });
 
+const PROGRAM_HEADER_END_STRING = "// ENDPROGRAMHEADERS //";
+
 const PROGRAM_SAVE_JSON_DEFAULT = {
     "contentKindCode": "p",
     "newUrlPath": "/computer-programming/new/pjs",
@@ -89,5 +91,6 @@ const PROGRAM_SAVE_JSON_DEFAULT = {
 };
 
 module.exports = {
-    PROGRAM_SAVE_JSON_DEFAULT
+    PROGRAM_SAVE_JSON_DEFAULT,
+    PROGRAM_HEADER_END_STRING
 };
