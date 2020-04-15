@@ -1,6 +1,6 @@
 const axios = require("axios");
 const {makePutRequest, makePostRequest} = require("./session");
-const {parseProgramHeaders, stripProgramHeaders} = require("../program_header");
+const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = require("../program_header");
 const PROGRAM_DEFAULT_JSON = require("./constants").PROGRAM_SAVE_JSON_DEFAULT;
 
 /**
@@ -96,9 +96,16 @@ async function getProgramCodeAndHeaders(id) {
     return [codeHeaders, code];
 }
 
+async function updateProgramCodeAndHeaders(cookies, programId, codeHeaders, code, settings={}) {
+    const codeWithHeaders = generateProgramHeaders(codeHeaders) + "\n" + code;
+
+    return updateProgram(cookies, program, codeWithHeaders, settings);
+}
+
 module.exports = {
     getProgramJSON,
     updateProgram,
     newProgram,
-    getProgramCodeAndHeaders
+    getProgramCodeAndHeaders,
+    updateProgramCodeAndHeaders
 };
