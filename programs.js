@@ -99,7 +99,7 @@ async function getProgramCodeAndHeaders(id) {
 async function updateProgramCodeAndHeaders(cookies, programId, codeHeaders, code, settings={}) {
     const codeWithHeaders = generateProgramHeaders(codeHeaders) + "\n" + code;
 
-    return updateProgram(cookies, program, codeWithHeaders, settings);
+    return updateProgram(cookies, programId, codeWithHeaders, settings);
 }
 
 module.exports = {
