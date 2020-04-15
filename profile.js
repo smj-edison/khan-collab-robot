@@ -2,7 +2,7 @@ const axios = require("axios");
 const {cookiesToCookieString} = require("./cookies");
 const {GET_FULL_USER_PROFILE_QUERY} = require("./constants");
 
-async function getKaidFromUsername(username, cookies) {
+async function getKaidFromUsername(username) {
     let body = {
         "operationName": "getFullUserProfile",
         "variables":{"username": "username"},
@@ -11,11 +11,7 @@ async function getKaidFromUsername(username, cookies) {
 
     let url = "https://www.khanacademy.org/api/internal/graphql/getFullUserProfile?lang=en";
 
-    return axios.post(url, body, {
-        "headers": {
-            "Cookie": cookiesToCookieString(cookies)
-        }
-    }).then(result => {
+    return axios.post(url, body).then(result => {
         return result.data.data.user.kaid;
     });
 }
