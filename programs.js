@@ -1,6 +1,6 @@
 const axios = require("axios");
 const {makePutRequest, makePostRequest} = require("./session");
-const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = require("../program_header");
+const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = require("./program_header");
 const PROGRAM_DEFAULT_JSON = require("./constants").PROGRAM_SAVE_JSON_DEFAULT;
 
 /**
