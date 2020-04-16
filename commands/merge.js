@@ -1,27 +1,16 @@
-const {getProgramJSON, updateProgram} = require("../programs");
-const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = require("../program_header");
+const {updateProgramCodeAndHeaders, getProgramCodeAndHeaders} = require("../programs");
+const {isAuthor, isContributor} = require("../authorization");
 
 async function merge(args, kaid, cookies) {
     const programNew = args[0]; // the new code
     const programOld = args[1]; // the program being merged into
 
-    // get the code from both of them
-    const programNewJSON = await getProgramJSON(programNew);
-    const programOldJSON = await getProgramJSON(programOld);
+    let [programNewHeaders, programNewCode] = await getProgramCodeAndHeaders(programNew);
+    let [programOldHeaders, programOldCode] = await getProgramCodeAndHeaders(programOld);
 
-    const programNewCodeRaw = programNewJSON.revision.code;
-    const programOldCodeRaw = programOldJSON.revision.code;
-
-    // get the program headers
-    const programNewHeaders = parseProgramHeaders(programNewCodeRaw);
-    const programOldHeaders = parseProgramHeaders(programOldCodeRaw);
-
-    const programNewCode = stripProgramHeaders(programNewCodeRaw);
-    const programOldCode = stripProgramHeaders(programOldCodeRaw);
-
-    // make sure they own it
-    if(kaid !== programOldHeaders.author) {
-        return "You are not the author. You cannot merge.";
+    // make sure they have permission
+    if(!(isAuthor(programOldHeaders, kaid) || isContributor(programOldHeaders, kaid))) {
+        return "You are not authorized to do this.";
     }
 
     // this is where merging should be calculated (I'm cheating)
@@ -30,8 +19,7 @@ async function merge(args, kaid, cookies) {
     const newHeaders = programOldHeaders;
 
     // update the program
-    const newCodeWithHeaders = generateProgramHeaders(newHeaders) + "\n" + newCode;
-    await updateProgram(cookies, programOld, newCodeWithHeaders);
+    await updateProgramCodeAndHeaders(cookies, programOld, newHeaders, newCode);
 
     return "Your program was successfully merged.";
 }
