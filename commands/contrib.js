@@ -14,13 +14,15 @@ async function addContributor(args, kaid, cookies) {
 
     let contributors = codeHeaders.contributors ? codeHeaders.contributors.split(",") : [];
 
-    console.log(contributors);
-
-    contributors.push(newContributorKaid);
+    if(!contributors.includes(newContributorKaid)) {
+        contributors.push(newContributorKaid);
+    }
 
     codeHeaders.contributors = contributors.join(",");
 
     await updateProgramCodeAndHeaders(cookies, programId, codeHeaders, code);
+
+    return newContributor + " added as a contributor.";
 }
 
 async function contrib(args, kaid, cookies) {
