@@ -1,5 +1,6 @@
 const {getKaidFromUsername} = require("../profile");
 const {getProgramCodeAndHeaders, updateProgramCodeAndHeaders} = require("../programs");
+const {isAuthor} = require("../authorization");
 
 async function addContributor(args, kaid, cookies) {
     const newContributor = args[0];
@@ -8,7 +9,7 @@ async function addContributor(args, kaid, cookies) {
     const newContributorKaid = await getKaidFromUsername(newContributor);
     const [codeHeaders, code] = await getProgramCodeAndHeaders(programId);
 
-    if(codeHeaders.author !== kaid) {
+    if(!isAuthor(codeHeaders, kaid)) {
         return "You are not the author. You cannot add contributors.";
     }
 
