@@ -21,7 +21,6 @@ async function getState() {
  * @param {Object} json The JSON to write to the file
  */
 async function setState(json) {
-    console.log(STATE_FILE_LOCATION);
     return fsp.writeFile(STATE_FILE_LOCATION, JSON.stringify(json));
 }
 
