@@ -23,6 +23,18 @@ async function setState(json) {
     return fsp.writeFile(STATE_FILE_LOCATION, JSON.stringify(json));
 }
 
+/**
+ * modifyState will modify the state file. It loads the state, executes the lambda
+ * on the state, and then saves the state
+ * 
+ * @param {function} lambdaThatWillModifyState A lambda that should modify the state
+ */
+async function modifyState(lambdaThatWillModifyState) {
+    let state = await getState();
+    lambdaThatWillModifyState(state);
+    await setState(state);
+}
+
 module.exports = {
     getState,
     setState
