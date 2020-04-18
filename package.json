@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
-    "lockfile": "^1.0.4",
+    "proper-lockfile": "^4.1.1",
     "qs": "~6.8.0"
   },
   "author": "Mason Jones",
