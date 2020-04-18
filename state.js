@@ -1,5 +1,6 @@
 const fsp = require("fs").promises;
 const {STATE_FILE_LOCATION} = require("./constants.js");
+const {lock, unlock} = require("lockfile");
 
 /**
  * getState returns the current value of the state json file.
@@ -30,12 +31,29 @@ async function setState(json) {
  * @param {function} lambdaThatWillModifyState A lambda that should modify the state
  */
 async function modifyState(lambdaThatWillModifyState) {
-    let state = await getState();
-    lambdaThatWillModifyState(state);
-    await setState(state);
+    return new Promise(resolve, reject => {
+        // keep the file locked so it isn't modified
+        lock(STATE_FILE_LOCATION, async function(err) {
+            if(err) reject(err); // reject if there were any errors
+
+            //get the state, modify it, and save it again
+            let state = await getState();
+            lambdaThatWillModifyState(state);
+            await setState(state);
+
+            // unlock once all the operations are complete
+            unlock(STATE_FILE_LOCATION, err => {
+                if(err) reject(err);
+                
+                // resolve with the new state
+                resolve(state);
+            });
+        });
+    });
 }
 
 module.exports = {
     getState,
-    setState
+    setState,
+    modifyState
 };
