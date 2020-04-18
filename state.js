@@ -22,3 +22,8 @@ async function getState() {
 async function setState(json) {
     return fsp.writeFile(STATE_FILE_LOCATION, JSON.stringify(json));
 }
+
+module.exports = {
+    getState,
+    setState
+};
