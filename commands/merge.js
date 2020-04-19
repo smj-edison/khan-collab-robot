@@ -1,6 +1,7 @@
 const {updateProgramCodeAndHeaders, getProgramCodeAndHeaders} = require("../programs");
 const {isAuthor, isContributor} = require("../authorization");
 const {loadProgramHistory, updateProgramHistory} = require("../program_history");
+const uuidv1 = require("uuid").v1;
 
 
 async function merge(args, kaid, cookies) {
@@ -10,10 +11,10 @@ async function merge(args, kaid, cookies) {
     let [branchHeaders, branchCode] = await getProgramCodeAndHeaders(programBranch);
     let [masterHeaders, masterCode] = await getProgramCodeAndHeaders(programMaster);
 
-    const programHistory = loadProgramHistory(masterHeaders.historyprogramid);
+    let programHistory = await loadProgramHistory(masterHeaders.historyprogramid);
 
     // make sure they have permission
-    if(!(isAuthor(masterHeaders, kaid) || isContributor(masterHeaders, kaid))) {
+    if(!isAuthor(masterHeaders, kaid) && !isContributor(masterHeaders, kaid)) {
         return "You are not authorized to do this.";
     }
 
@@ -23,18 +24,23 @@ async function merge(args, kaid, cookies) {
     const newHeaders = masterHeaders;
 
     // record the merge in the program history
+    const mergeId = uuidv1();
+
+    newHeaders.currentmergeid = mergeId;
+
     if(!programHistory.merges) programHistory.merges = [];
 
     programHistory.merges.push({
         timestamp: Date.now(),
         code: newCode,
-        mergeId: programBranch
+        programId: programBranch,
+        mergeId: mergeId
     });
 
     // update the program and history
     await Promise.all([
         updateProgramCodeAndHeaders(cookies, programMaster, newHeaders, newCode),
-        updateProgramHistory(cookies, programMaster, programHistory)
+        updateProgramHistory(cookies, masterHeaders.historyprogramid, programHistory)
     ]);
     
 
