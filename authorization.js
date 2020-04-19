@@ -1,5 +1,5 @@
 function isAuthor(programHeaders, kaid) {
-    return programHeaders.author !== kaid;
+    return programHeaders.author === kaid;
 }
 
 function isContributor(programHeaders, kaid) {
