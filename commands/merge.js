@@ -1,25 +1,42 @@
 const {updateProgramCodeAndHeaders, getProgramCodeAndHeaders} = require("../programs");
 const {isAuthor, isContributor} = require("../authorization");
+const {loadProgramHistory, updateProgramHistory} = require("../program_history");
+
 
 async function merge(args, kaid, cookies) {
-    const programNew = args[0]; // the new code
-    const programOld = args[1]; // the program being merged into
+    const programBranch = args[0]; // the new code
+    const programMaster = args[1]; // the program being merged into
 
-    let [programNewHeaders, programNewCode] = await getProgramCodeAndHeaders(programNew);
-    let [programOldHeaders, programOldCode] = await getProgramCodeAndHeaders(programOld);
+    let [branchHeaders, branchCode] = await getProgramCodeAndHeaders(programBranch);
+    let [masterHeaders, masterCode] = await getProgramCodeAndHeaders(programMaster);
+
+    const programHistory = loadProgramHistory(masterHeaders.historyprogramid);
 
     // make sure they have permission
-    if(!(isAuthor(programOldHeaders, kaid) || isContributor(programOldHeaders, kaid))) {
+    if(!(isAuthor(masterHeaders, kaid) || isContributor(masterHeaders, kaid))) {
         return "You are not authorized to do this.";
     }
 
     // this is where merging should be calculated (I'm cheating)
     // TODO: account for the headers at the top of the program
-    const newCode = programNewCode;
-    const newHeaders = programOldHeaders;
+    const newCode = branchCode;
+    const newHeaders = masterHeaders;
 
-    // update the program
-    await updateProgramCodeAndHeaders(cookies, programOld, newHeaders, newCode);
+    // record the merge in the program history
+    if(!programHistory.merges) programHistory.merges = [];
+
+    programHistory.merges.push({
+        timestamp: Date.now(),
+        code: newCode,
+        mergeId: programBranch
+    });
+
+    // update the program and history
+    await Promise.all([
+        updateProgramCodeAndHeaders(cookies, programMaster, newHeaders, newCode),
+        updateProgramHistory(cookies, programMaster, programHistory)
+    ]);
+    
 
     return "Your program was successfully merged.";
 }
