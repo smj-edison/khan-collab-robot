@@ -102,10 +102,19 @@ async function updateProgramCodeAndHeaders(cookies, programId, codeHeaders, code
     return updateProgram(cookies, programId, codeWithHeaders, settings);
 }
 
+async function changeProgramHeaders(cookies, programId, lambdaThatWillChangeHeaders) {
+    let [headers, code] = await getProgramCodeAndHeaders(programId);
+
+    lambdaThatWillChangeHeaders(headers);
+
+    await updateProgramCodeAndHeaders(cookies, programId, headers, code);
+}
+
 module.exports = {
     getProgramJSON,
     updateProgram,
     newProgram,
     getProgramCodeAndHeaders,
-    updateProgramCodeAndHeaders
+    updateProgramCodeAndHeaders,
+    changeProgramHeaders
 };
