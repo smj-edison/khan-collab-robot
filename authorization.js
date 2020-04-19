@@ -3,7 +3,7 @@ function isAuthor(programHeaders, kaid) {
 }
 
 function isContributor(programHeaders, kaid) {
-    const contributors = programHeaders.contributors ? codeHeaders.contributors.split(",") : [];
+    const contributors = programHeaders.contributors ? programHeaders.contributors.split(",") : [];
 
     return contributors.includes(kaid);
 }
