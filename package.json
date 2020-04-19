@@ -9,7 +9,8 @@
   "dependencies": {
     "axios": "^0.19.2",
     "proper-lockfile": "^4.1.1",
-    "qs": "~6.8.0"
+    "qs": "~6.8.0",
+    "uuid": "^7.0.3"
   },
   "author": "Mason Jones",
   "license": "MIT"
