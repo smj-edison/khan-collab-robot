@@ -1,5 +1,5 @@
 const axios = require("axios");
-const {makePutRequest, makePostRequest} = require("./session");
+const {makePutRequest, makePostRequest, makeDeleteRequest} = require("./session");
 const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = require("./program_header");
 const PROGRAM_DEFAULT_JSON = require("./constants").PROGRAM_SAVE_JSON_DEFAULT;
 
@@ -116,6 +116,12 @@ async function spinOffProgram(cookies, originalProgram, code, settings={}) {
     return makePostRequest(url, jsonToSend, cookies);
 }
 
+async function deleteProgram(cookies, programId) {
+    let url = `https://www.khanacademy.org/api/internal/scratchpads/${programId}?client_dt=${getQueryTime()}&lang=en`;
+    
+    return makeDeleteRequest(url, cookies);
+}
+
 async function getProgramCodeAndHeaders(id) {
     const program = await getProgramJSON(id);
 
@@ -152,6 +158,7 @@ module.exports = {
     updateProgram,
     spinOffProgram,
     newProgram,
+    deleteProgram,
     getProgramCodeAndHeaders,
     updateProgramCodeAndHeaders,
     changeProgramHeaders,
