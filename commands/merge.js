@@ -33,6 +33,28 @@ function calculateMerge(o, a, b) {
     };
 }
 
+async function successfulMerge(programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders, cookies) {
+    // record the merge in the program history
+    const mergeId = uuidv1();
+    newHeaders.currentmergeid = mergeId;
+
+    programHistory.merges.push({
+        timestamp: Date.now(),
+        code: newCode,
+        programId: programBranchId,
+        mergeId: mergeId
+    });
+
+    // update the program and history
+    await Promise.all([
+        updateProgramCodeAndHeaders(cookies, programMasterId, newHeaders, newCode),
+        updateProgramHistory(cookies, masterHeaders.historyprogramid, programHistory)
+    ]);
+
+
+    return "Your program was successfully merged.";
+}
+
 async function merge(args, kaid, cookies) {
     const programBranch = args[0]; // the new code
     const programMaster = args[1]; // the program being merged into
@@ -48,30 +70,23 @@ async function merge(args, kaid, cookies) {
         return "You are not authorized to do this.";
     }
 
+    // find the code for this revision
+    let originalCode = programHistory.find(mergeHistory => {
+        return mergeHistory.mergeId === branchHeaders.currentmergeid;
+    }) || masterCode;
+
     // this is where merging should be calculated (I'm cheating)
     // TODO: account for the headers at the top of the program
-    const newCode = branchCode;
+    const mergeResult = calculateMerge(originalCode, masterCode, branchCode);
+
+    const newCode = mergeResult.result;
     const newHeaders = masterHeaders;
 
-    // record the merge in the program history
-    const mergeId = uuidv1();
-    newHeaders.currentmergeid = mergeId;
+    if(mergeResult.conflict) {
 
-    programHistory.merges.push({
-        timestamp: Date.now(),
-        code: newCode,
-        programId: programBranch,
-        mergeId: mergeId
-    });
-
-    // update the program and history
-    await Promise.all([
-        updateProgramCodeAndHeaders(cookies, programMaster, newHeaders, newCode),
-        updateProgramHistory(cookies, masterHeaders.historyprogramid, programHistory)
-    ]);
-    
-
-    return "Your program was successfully merged.";
+    } else {
+        successfulMerge(programHistory, programBranch, programMaster, masterHeaders, newCode, newHeaders, cookies);
+    }
 }
 
 module.exports = merge;
