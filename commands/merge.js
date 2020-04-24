@@ -1,8 +1,21 @@
-const {updateProgramCodeAndHeaders, getProgramCodeAndHeaders} = require("../programs");
+const {updateProgramCodeAndHeaders, getProgramCodeAndHeaders, spinOffProgramCodeAndHeaders, deleteProgram, getProgramJSON} = require("../programs");
 const {isAuthor, isContributor} = require("../authorization");
 const {loadProgramHistory, updateProgramHistory} = require("../program_history");
 const uuidv1 = require("uuid").v1;
 const Diff3 = require("node-diff3");
+
+function addMergeRecord(programHistory, newCode, programBranchId) {
+    const mergeId = uuidv1();
+
+    programHistory.merges.push({
+        timestamp: Date.now(),
+        code: newCode,
+        programId: programBranchId,
+        mergeId: mergeId
+    });
+
+    return mergeId;
+}
 
 function calculateMerge(o, a, b) {
     o = o.split("\n");
@@ -33,17 +46,9 @@ function calculateMerge(o, a, b) {
     };
 }
 
-async function successfulMerge(programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders, cookies) {
+async function successfulMerge(cookies, programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders) {
     // record the merge in the program history
-    const mergeId = uuidv1();
-    newHeaders.currentmergeid = mergeId;
-
-    programHistory.merges.push({
-        timestamp: Date.now(),
-        code: newCode,
-        programId: programBranchId,
-        mergeId: mergeId
-    });
+    newHeaders.currentmergeid = addMergeRecord(programHistory, newCode, programBranchId);
 
     // update the program and history
     await Promise.all([
@@ -51,8 +56,58 @@ async function successfulMerge(programHistory, programBranchId, programMasterId,
         updateProgramHistory(cookies, masterHeaders.historyprogramid, programHistory)
     ]);
 
-
     return "Your program was successfully merged.";
+}
+
+async function conflictedMerge(cookies, programBranchId, programMasterId, newCode, newHeaders) {
+    newHeaders.conflict = "true";
+    newHeaders.conflictedbranch = programBranchId;
+
+    const result = await spinOffProgramCodeAndHeaders(cookies, programBranchId, newHeaders, newCode);
+
+    return `Your program has a conflict. Please resolve and spin-off at https://www.khanacademy.org${result.data.relativeUrl}`;
+}
+
+async function resolveConflict(cookies, programHistory, programBranchId, programMasterId, masterHeaders, branchCode, branchHeaders) {
+    // make sure there isn't any conflicted code in it
+    let conflictedCode = branchCode.split("\n").find(line => {
+        return line === "<<<<<<<<<" ||
+               line === "=========" ||
+               line === ">>>>>>>>>";
+    });
+
+    if(conflictedCode) {
+        return "You have not removed all conflicts. Remove all conflicts and try again.";
+    }
+
+    // record the merge in the program history
+    branchHeaders.currentmergeid = addMergeRecord(programHistory, branchCode, programBranchId);
+
+    const conflictedBranch = branchHeaders.conflictedbranch;
+
+    delete branchHeaders.conflict;
+    delete branchHeaders.conflictedbranch;
+
+    // update the program and history
+    await Promise.all([
+        updateProgramCodeAndHeaders(cookies, programMasterId, branchHeaders, branchCode),
+        updateProgramHistory(cookies, masterHeaders.historyprogramid, programHistory)
+    ]);
+
+    /// delete the program the showed all the conflicts ///
+
+    const branchJSON = await getProgramJSON(programBranchId);
+    // the program that showed all the conflicts
+    const conflictProgram = branchJSON.originScratchpadId;
+
+    const [conflictProgramHeaders, _] = await getProgramCodeAndHeaders(conflictProgram);
+
+    // make sure that the program is actually conflicted, and not just trying to delete someone else's program
+    if(conflictProgramHeaders.conflict === "true") {
+        await deleteProgram(cookies, conflictProgram);
+    }
+
+    return `Conflict successfully resolved. Be sure to delete https://khanacademy.org/computer-programming/_/${programBranchId}`;
 }
 
 async function merge(args, kaid, cookies) {
@@ -70,6 +125,11 @@ async function merge(args, kaid, cookies) {
         return "You are not authorized to do this.";
     }
 
+    // if it's resolving a conflict
+    if(branchHeaders.conflict === "true") {
+        return await resolveConflict(cookies, programHistory, programBranch, programMaster, masterHeaders, branchCode, branchHeaders);        
+    }
+
     // find the code for this revision
     let originalCode = programHistory.merges.find(mergeHistory => {
         return mergeHistory.mergeId === branchHeaders.currentmergeid;
@@ -83,9 +143,9 @@ async function merge(args, kaid, cookies) {
     const newHeaders = masterHeaders;
 
     if(mergeResult.conflict) {
-        
+        return await conflictedMerge(cookies, programBranch, newCode, newHeaders);
     } else {
-        successfulMerge(programHistory, programBranch, programMaster, masterHeaders, newCode, newHeaders, cookies);
+        return await successfulMerge(cookies, programHistory, programBranch, programMaster, masterHeaders, newCode, newHeaders);
     }
 }
 
