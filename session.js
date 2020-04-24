@@ -51,6 +51,21 @@ async function makePutRequest(url, body, cookies) {
 }
 
 /**
+ * Make a DELETE request with the proper authentication on Khan Academy
+ * 
+ * @param {string} url The resource to delete
+ * @param {Object} cookies A list of cookies returned from a axios's request (set-cookie header)
+ */
+async function makeDeleteRequest(url, cookies) {
+    return axios.delete(url, {
+        "headers": {
+            "Cookie": cookiesToCookieString(cookies),
+            "X-KA-FKey": getCookieValue(cookies, "fkey")
+        }
+    })
+}
+
+/**
  * Load khanacademy.org and return a list of all the cookies
 **/
 function getSessionCookies() {
@@ -86,6 +101,7 @@ module.exports = {
     makeGetRequest,
     makePostRequest,
     makePutRequest,
+    makeDeleteRequest,
     getSessionCookies,
     login
 };
