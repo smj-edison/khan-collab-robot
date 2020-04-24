@@ -71,19 +71,19 @@ async function merge(args, kaid, cookies) {
     }
 
     // find the code for this revision
-    let originalCode = programHistory.find(mergeHistory => {
+    let originalCode = programHistory.merges.find(mergeHistory => {
         return mergeHistory.mergeId === branchHeaders.currentmergeid;
     }) || masterCode;
 
     // this is where merging should be calculated (I'm cheating)
     // TODO: account for the headers at the top of the program
-    const mergeResult = calculateMerge(originalCode, masterCode, branchCode);
+    const mergeResult = calculateMerge(originalCode.code, masterCode, branchCode);
 
     const newCode = mergeResult.result;
     const newHeaders = masterHeaders;
 
     if(mergeResult.conflict) {
-
+        
     } else {
         successfulMerge(programHistory, programBranch, programMaster, masterHeaders, newCode, newHeaders, cookies);
     }
