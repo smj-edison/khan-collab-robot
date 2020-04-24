@@ -2,7 +2,36 @@ const {updateProgramCodeAndHeaders, getProgramCodeAndHeaders} = require("../prog
 const {isAuthor, isContributor} = require("../authorization");
 const {loadProgramHistory, updateProgramHistory} = require("../program_history");
 const uuidv1 = require("uuid").v1;
+const Diff3 = require("node-diff3");
 
+function calculateMerge(o, a, b) {
+    o = o.split("\n");
+    a = a.split("\n");
+    b = b.split("\n");
+
+    const results = Diff3.merge(a, o, b);
+
+    if(!results.conflict) {
+        return {
+            conflict: false,
+            result: results.result.join("\n")
+        };
+    }
+
+    // get rid of spacing generated arount merge conflict string
+    results.result = results.result.map(val => {
+        if(val === "\n<<<<<<<<<\n") return "<<<<<<<<<";
+        if(val === "\n=========\n") return "=========";
+        if(val === "\n>>>>>>>>>\n") return ">>>>>>>>>";
+
+        return val;
+    });
+
+    return {
+        conflict: true,
+        result: results.result.join("\n")
+    };
+}
 
 async function merge(args, kaid, cookies) {
     const programBranch = args[0]; // the new code
@@ -12,6 +41,7 @@ async function merge(args, kaid, cookies) {
     let [masterHeaders, masterCode] = await getProgramCodeAndHeaders(programMaster);
 
     let programHistory = await loadProgramHistory(masterHeaders.historyprogramid);
+    if(!programHistory.merges) programHistory.merges = [];
 
     // make sure they have permission
     if(!isAuthor(masterHeaders, kaid) && !isContributor(masterHeaders, kaid)) {
@@ -25,10 +55,7 @@ async function merge(args, kaid, cookies) {
 
     // record the merge in the program history
     const mergeId = uuidv1();
-
     newHeaders.currentmergeid = mergeId;
-
-    if(!programHistory.merges) programHistory.merges = [];
 
     programHistory.merges.push({
         timestamp: Date.now(),
