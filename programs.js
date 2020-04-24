@@ -85,6 +85,37 @@ async function newProgram(cookies, code, settings={}) {
     return makePostRequest(url, jsonToSend, cookies);
 }
 
+async function spinOffProgram(cookies, originalProgram, code, settings={}) {
+    let originalProgramJSON = await getProgramJSON(originalProgram);
+
+    let jsonToSend = {
+        title: "New program",
+        originRevisionId: originalProgramJSON.revision.id,
+        originScratchpadId: originalProgram,
+        originScratchpadKind: "Scratchpad",
+        revision: {
+            code: code || "",
+            editor_type: "ace_pjs",
+            editorType: "ace_pjs",
+            folds: [],
+            image_url: PROGRAM_DEFAULT_JSON.revision.image_url,
+            mp3Url: "",
+            translatedMp3Url: null,
+            youtubeId: null,
+            playback: "",
+            tests: "",
+            config_version: 4,
+            configVersion: 4,
+            topic_slug: "computer-programming"
+        },
+        ...settings
+    };
+
+    let url = `https://www.khanacademy.org/api/internal/scratchpads?client_dt=${getQueryTime()}&lang=en`;
+
+    return makePostRequest(url, jsonToSend, cookies);
+}
+
 async function getProgramCodeAndHeaders(id) {
     const program = await getProgramJSON(id);
 
@@ -102,6 +133,12 @@ async function updateProgramCodeAndHeaders(cookies, programId, codeHeaders, code
     return updateProgram(cookies, programId, codeWithHeaders, settings);
 }
 
+async function spinOffProgramCodeAndHeaders(cookies, originalProgramId, codeHeaders, code, settings={}) {
+    const codeWithHeaders = generateProgramHeaders(codeHeaders) + "\n" + code;
+
+    return spinOffProgram(cookies, originalProgramId, codeWithHeaders, settings);
+}
+
 async function changeProgramHeaders(cookies, programId, lambdaThatWillChangeHeaders) {
     let [headers, code] = await getProgramCodeAndHeaders(programId);
 
@@ -113,8 +150,10 @@ async function changeProgramHeaders(cookies, programId, lambdaThatWillChangeHead
 module.exports = {
     getProgramJSON,
     updateProgram,
+    spinOffProgram,
     newProgram,
     getProgramCodeAndHeaders,
     updateProgramCodeAndHeaders,
-    changeProgramHeaders
+    changeProgramHeaders,
+    spinOffProgramCodeAndHeaders
 };
