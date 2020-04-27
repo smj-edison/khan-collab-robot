@@ -1,4 +1,6 @@
 const {makeGetRequest} = require("./session");
+const axios = require("axios");
+const {cookiesToCookieString, getCookieValue} = require("./cookies");
 
 async function getNotificationsRequest(cookies, cursor) {
     let cursorString = cursor ? `&cursor=${cursor}` : "";
@@ -34,6 +36,17 @@ async function getBrandNewNotifications(cookies) {
     return notifications;
 }
 
+async function clearNewNotifications(cookies) {
+    const url = "https://www.khanacademy.org/api/internal/user/notifications/clear_brand_new?lang=en";
+
+    return axios.post(url, "", {
+        "headers": {
+            "Cookie": cookiesToCookieString(cookies),
+            "X-KA-FKey": getCookieValue(cookies, "fkey")
+        }
+    });
+}
+
 function parseNotificationJSON(json) {
     var notificationType = json.class_[json.class_.length - 1];
 
@@ -46,3 +59,8 @@ function parseNotificationJSON(json) {
 
     return null;
 }
+
+module.exports = {
+    getBrandNewNotifications,
+    clearNewNotifications
+};
