@@ -53,7 +53,14 @@ function parseNotificationJSON(json) {
     if(notificationType === "ScratchpadFeedbackNotification") {
         return {
             type: "program-feedback",
-            programId: json.scratchpadRelativeUrl.substring(json.scratchpadRelativeUrl.lastIndexOf("/") + 1)
+            programId: json.scratchpadRelativeUrl.substring(json.scratchpadRelativeUrl.lastIndexOf("/") + 1),
+            value: json.content
+        };
+    } else if(notificationType === "ResponseFeedbackNotification") {
+        return {
+            type: "response-feedback",
+            commentId: json.feedbackHierarchy[1],
+            value: json.content
         };
     }
 
