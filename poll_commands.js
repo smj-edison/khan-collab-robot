@@ -2,7 +2,7 @@ const {getCommentsOnComment, commentOnComment} = require("./comments");
 const {runCommand} = require("./command_router");
 const {getState, modifyState} = require("./state");
 
-async function pollCommands(commentId, cookies) {
+async function pollCommandsOnComment(commentId, cookies) {
     const lastComment = (await getState()).lastComment;
 
     let allComments = await getCommentsOnComment(commentId);
@@ -44,5 +44,5 @@ async function pollCommands(commentId, cookies) {
 }
 
 module.exports = {
-    pollCommands
+    pollCommandsOnComment
 };
