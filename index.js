@@ -2,7 +2,7 @@
 
 const {login} = require("./session");
 const {updateProgram} = require("./programs");
-const {pollCommands} = require("./poll_commands");
+const {pollCommandsOnComment} = require("./poll_commands");
 
 let username = process.env.USERNAME;
 let password = process.env.PASSWORD;
@@ -11,7 +11,7 @@ function checkForNewCommands(cookies) {
     console.log("checking for new posts");
 
     // TODO: crappy job here
-    pollCommands(process.env.COMMAND_COMMENT, cookies);
+    pollCommandsOnComment(process.env.COMMAND_COMMENT, cookies);
 }
 
 //capture results so that they aren't printed to the console
