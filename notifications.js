@@ -2,6 +2,10 @@ const {makeGetRequest} = require("./session");
 const axios = require("axios");
 const {cookiesToCookieString, getCookieValue} = require("./cookies");
 
+async function getRootComment(cookies, commentId) {
+    const url = `https://www.khanacademy.org/api/internal/discussions/scratchpad/5185814099542016/comments?casing=camel&lang=en&qa_expand_key=${commentId}`;
+}
+
 async function getNotificationsRequest(cookies, cursor) {
     let cursorString = cursor ? `&cursor=${cursor}` : "";
     let url = `https://www.khanacademy.org/api/internal/user/notifications/readable?casing=camel${cursorString}&_=200324-0901-e040f1fb5249_${Date.now()}`;
@@ -59,7 +63,8 @@ function parseNotificationJSON(json) {
     } else if(notificationType === "ResponseFeedbackNotification") {
         return {
             type: "response-feedback",
-            commentId: json.feedbackHierarchy[1],
+            parentCommentId: json.feedbackHierarchy[1],
+            commentId: json.feedbackHierarchy[0],
             value: json.content
         };
     }

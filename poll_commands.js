@@ -1,6 +1,7 @@
 const {getCommentsOnComment, commentOnComment} = require("./comments");
 const {runCommand} = require("./command_router");
 const {getState, modifyState} = require("./state");
+const {getAndParseNewNotifications} = require("./notifications");
 
 async function pollCommandsOnComment(commentId, cookies) {
     const lastComment = (await getState()).lastComment;
@@ -40,6 +41,22 @@ async function pollCommandsOnComment(commentId, cookies) {
     
     await modifyState(function(state) {
         state.lastComment = newLastComment;
+    });
+}
+
+async function pollCommandsFromNotifications(cookies) {
+    const notifs = await getAndParseNewNotifications(cookies);
+
+    notifs.forEach(async notif => {
+        switch(notif.type) {
+            case "response-feedback":
+                const kaid = await getResponseFeedbackKaid(notif.commentId);
+
+                runCommand(notif.value, kaid, cookies);
+            break;
+        }
+
+        
     });
 }
 
