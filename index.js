@@ -7,7 +7,7 @@ const {pollCommands} = require("./poll_commands");
 let username = process.env.USERNAME;
 let password = process.env.PASSWORD;
 
-function checkForNewCommands() {
+function checkForNewCommands(cookies) {
     console.log("checking for new posts");
 
     // TODO: crappy job here
@@ -20,9 +20,9 @@ let _ = (async function() {
     let cookies = await login(username, password);
     console.log("logged in");
 
-    checkForNewCommands();
+    checkForNewCommands(cookies);
 
     setInterval(() => {
-        checkForNewCommands();
+        checkForNewCommands(cookies);
     }, 1000 * 10);
 })();
