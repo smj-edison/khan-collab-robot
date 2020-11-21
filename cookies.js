@@ -9,7 +9,9 @@ function getCookieValue(cookies, cookieName) {
         return cookie.indexOf(cookieName) === 0;
     });
 
-    return cookie.substring(cookie.indexOf("=") + 1, cookie.lastIndexOf("; "));
+    const cookieSpliced = cookie.substring(cookie.indexOf("=") + 1);
+
+    return cookieSpliced.substring(0, cookieSpliced.indexOf("; "));
 }
 
 function cookieToKeyValue(cookie) {
