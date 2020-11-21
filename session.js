@@ -1,6 +1,7 @@
 const axios = require("axios");
 const qs = require("qs");
 const cookieHelper = require("./cookies.js");
+const {LOGIN_QUERY} = require("./constants.js");
 const {cookiesToCookieString, getCookieValue} = require("./cookies");
 
 /**
@@ -65,11 +66,26 @@ async function makeDeleteRequest(url, cookies) {
     })
 }
 
+const FKeyChars = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+/**
+ * Generates a FKey for a khan session
+ */
+function generateFKey() {
+    var chars = "";
+
+    for(var i = 0; i < 68; i++) {
+        chars += FKeyChars[Math.floor(Math.random() * FKeyChars.length)];
+    }
+
+    return `1.0_${chars}_${Date.now()}`;
+}
+
 /**
  * Load khanacademy.org and return a list of all the cookies
 **/
 function getSessionCookies() {
-    return axios.get("https://khanacademy.org").then((result) => {
+    return axios.get("https://khanacademy.org/login").then((result) => {
         return result.headers["set-cookie"];
     }, {withCredentials: true});
 }
@@ -78,7 +94,7 @@ function getSessionCookies() {
  * logs in a user, based on their username, password, and the cookies from `getSessionCookies()`
  * @returns an array of set-cookie headers from the server
 **/
-async function loginWithCookies(username, password, cookies) {
+async function loginWithCookiesOld(username, password, cookies) {
     return axios.post("https://www.khanacademy.org/login", qs.stringify({
         "identifier": username,
         "password": password,
@@ -89,8 +105,38 @@ async function loginWithCookies(username, password, cookies) {
     });
 }
 
+// fkey format: 1.0_[68 characters consisting of lowercase letters and numbers]_[timestamp]
+async function loginWithCookies(username, password, cookies) {
+    return axios.post("https://www.khanacademy.org/api/internal/graphql/loginWithPasswordMutation", {
+        "operationName": "loginWithPasswordMutation",
+        "variables": {
+            "identifier": username,
+            "password": password
+        },
+        "query": LOGIN_QUERY
+    }, { 
+        "headers": {
+            "Cookie": cookiesToCookieString(cookies),
+            "user-agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:83.0) Gecko/20100101 Firefox/83.0",
+            "x-ka-fkey": cookieHelper.getCookieValue(cookies, "fkey"),
+            "Referer": "https://www.khanacademy.org/",
+            "Origin": "https://www.khanacademy.org",
+            "Accept-Language": "en-US,en;q=0.5"
+        }
+    }).then((result) => {
+        return result.headers["set-cookie"];
+    });
+}
+
 async function login(username, password) {
+    if(username === undefined || password === undefined) {
+        throw "Username and or password missing!";
+    }
+
     let sessionCookies = await getSessionCookies();
+
+    sessionCookies.push(`fkey=${generateFKey()}; expires=${(new Date()).toUTCString()}; path=/`);
+
     let loginCookies = await loginWithCookies(username, password, sessionCookies);
     let cookies = cookieHelper.mergeCookies(sessionCookies, loginCookies);
 
