@@ -59,7 +59,7 @@ async function successfulMerge(cookies, programHistory, programBranchId, program
     return "Your program was successfully merged.";
 }
 
-async function conflictedMerge(cookies, programBranchId, programMasterId, newCode, newHeaders) {
+async function conflictedMerge(cookies, programBranchId, newCode, newHeaders) {
     newHeaders.conflict = "true";
     newHeaders.conflictedbranch = programBranchId;
 
@@ -131,9 +131,11 @@ async function merge(args, kaid, cookies) {
     }
 
     // find the code for this revision
-    let originalCode = programHistory.merges.find(mergeHistory => {
+    let baseRecord = programHistory.merges.find(mergeHistory => {
         return mergeHistory.mergeId === branchHeaders.currentmergeid;
-    }).code || masterCode;
+    });
+
+    let originalCode = baseRecord ? baseRecord.code : masterCode;
 
     // this is where merging should be calculated (I'm cheating)
     // TODO: account for the headers at the top of the program
