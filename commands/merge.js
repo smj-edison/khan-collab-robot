@@ -127,7 +127,7 @@ async function merge(args, kaid, cookies) {
 
     // if it's resolving a conflict
     if(branchHeaders.conflict === "true") {
-        return await resolveConflict(cookies, programHistory, programBranch, programMaster, masterHeaders, branchCode, branchHeaders);        
+        return await resolveConflict(cookies, programHistory, programBranch, programMaster, masterHeaders, branchCode, branchHeaders);
     }
 
     // find the code for this revision

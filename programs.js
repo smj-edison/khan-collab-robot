@@ -35,8 +35,8 @@ async function getProgramJSON(id) {
  * @param {*} code A string of with the code
  * @param {*} settings Settings to override the JSON request
  */
-async function updateProgram(cookies, programId, code, settings={}) {
-    var programJson = await getProgramJSON(programId); //get the program's JSON, is this necessary?
+async function updateProgram(cookies, programId, code, settings={}, programJson) {
+    programJson = programJson || await getProgramJSON(programId); //get the program's JSON, is this necessary?
 
     var jsonToSend = {
         ...PROGRAM_DEFAULT_JSON,
@@ -60,18 +60,18 @@ async function updateProgram(cookies, programId, code, settings={}) {
     return makePutRequest(url, jsonToSend, cookies);
 }
 
-async function newProgram(cookies, code, settings={}) {
+async function newProgram(cookies, code, settings={}, type) {
     let jsonToSend = {
         title: "New program",
         translatedTitle: "New program",
         category: null,
         difficulty: null,
         tags: [],
-        userAuthoredContentType: "pjs",
+        userAuthoredContentType: type,
         topicId: "xffde7c31",
         revision: {
             code: code || "",
-            editor_type: "ace_pjs",
+            editor_type: "ace_" + type,
             folds: [],
             image_url: PROGRAM_DEFAULT_JSON.revision.image_url,
             config_version: 4,
@@ -85,8 +85,8 @@ async function newProgram(cookies, code, settings={}) {
     return makePostRequest(url, jsonToSend, cookies);
 }
 
-async function spinOffProgram(cookies, originalProgram, code, settings={}) {
-    let originalProgramJSON = await getProgramJSON(originalProgram);
+async function spinOffProgram(cookies, originalProgram, code, settings={}, originalProgramJson) {
+    originalProgramJSON = originalProgramJson || await getProgramJSON(originalProgram);
 
     let jsonToSend = {
         title: "New program",
@@ -127,22 +127,26 @@ async function getProgramCodeAndHeaders(id) {
 
     const codeRaw = program.revision.code;
 
-    const codeHeaders = parseProgramHeaders(codeRaw);
-    const code = stripProgramHeaders(codeRaw);
+    const codeHeaders = parseProgramHeaders(codeRaw, program.userAuthoredContentType);
+    const code = stripProgramHeaders(codeRaw, program.userAuthoredContentType);
 
     return [codeHeaders, code];
 }
 
 async function updateProgramCodeAndHeaders(cookies, programId, codeHeaders, code, settings={}) {
-    const codeWithHeaders = generateProgramHeaders(codeHeaders) + "\n" + code;
+    const programJson = await getProgramJSON(programId);
 
-    return updateProgram(cookies, programId, codeWithHeaders, settings);
+    const codeWithHeaders = code + "\n" + generateProgramHeaders(codeHeaders, programJson.userAuthoredContentType);
+
+    return updateProgram(cookies, programId, codeWithHeaders, settings, programJson);
 }
 
 async function spinOffProgramCodeAndHeaders(cookies, originalProgramId, codeHeaders, code, settings={}) {
-    const codeWithHeaders = generateProgramHeaders(codeHeaders) + "\n" + code;
+    const originalProgramJson = await getProgramJSON(originalProgramId);
 
-    return spinOffProgram(cookies, originalProgramId, codeWithHeaders, settings);
+    const codeWithHeaders = code + "\n" + generateProgramHeaders(codeHeaders, originalProgramJson.userAuthoredContentType);
+
+    return spinOffProgram(cookies, originalProgramId, codeWithHeaders, settings, originalProgramJson);
 }
 
 async function changeProgramHeaders(cookies, programId, lambdaThatWillChangeHeaders) {
