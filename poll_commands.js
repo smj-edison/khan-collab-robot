@@ -28,6 +28,8 @@ async function pollCommands(commentId, cookies) {
         let kaid = allComments[i].authorKaid;
 
         newLastComment = allComments[i].key;
+
+        console.log(`Running command ${text} as user ${kaid}`);
         
         runCommand(text, kaid, cookies).then((function(response) {
             commentOnComment(this.commentId, response, cookies);
