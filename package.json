@@ -12,7 +12,8 @@
     "node-diff3": "^2.1.0",
     "proper-lockfile": "^4.1.1",
     "qs": "^6.8.2",
-    "uuid": "^7.0.3"
+    "uuid": "^7.0.3",
+    "yargs": "^16.1.1"
   },
   "author": "Mason Jones",
   "license": "MIT"
