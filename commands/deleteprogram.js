@@ -1,4 +1,5 @@
 const {getProgramCodeAndHeaders, deleteProgram} = require("../programs");
+const {isAuthor} = require("../authorization.js");
 
 async function deleteprogram(args, kaid, cookies) {
     const programId = args[0];
