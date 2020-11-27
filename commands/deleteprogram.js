@@ -11,6 +11,7 @@ async function deleteprogram(args, kaid, cookies) {
     }
 
     await deleteProgram(cookies, programId);
+    await deleteProgram(cookies, headers.historyprogramid);
 
     return "Successfully deleted program.";
 }
