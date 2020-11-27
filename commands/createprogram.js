@@ -10,7 +10,7 @@ async function createprogram(args, kaid, cookies) {
         .choices("type", ["pjs", "webpage", "sql"]).alias("t", "type").default("type", "pjs").argv;
 
     // create the program
-    const programResult = await newProgram(cookies, generateProgramHeaders({
+    const programResult = await newProgram(cookies, "Put code here\n\n\n" + generateProgramHeaders({
         author: kaid
     }, args.type), {
         title: args._.length > 0 ? args._.join(" ") : "New program",
