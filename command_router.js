@@ -23,7 +23,7 @@ const routes = {
 async function runCommand(text, kaid, cookies) {
     // TODO: parse commands better
     let args = text.split(" ");
-    let command = args.splice(0, 1)[0];
+    let command = args.splice(0, 1)[0].toLowerCase();
 
     if(!(command in routes)) {
         return `The command ${command} does not exist.`;
