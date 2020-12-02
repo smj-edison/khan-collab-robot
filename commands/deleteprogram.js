@@ -11,8 +11,10 @@ async function deleteprogram(args, kaid, cookies) {
         return "You are not authorized to do this.";
     }
 
-    await deleteProgram(cookies, programId);
-    await deleteProgram(cookies, headers.historyprogramid);
+    await Promise.all([
+        deleteProgram(cookies, programId),
+        deleteProgram(cookies, headers.historyprogramid)
+    ]);
 
     return "Successfully deleted program.";
 }
