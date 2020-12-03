@@ -11,6 +11,8 @@ const programsettings = require("./commands/programsettings.js");
 const merge = require("./commands/merge");
 const contrib = require("./commands/contrib");
 
+const CommandError = require("./command_error.js");
+
 const routes = {
     test,
     createprogram,
@@ -21,15 +23,23 @@ const routes = {
 };
 
 async function runCommand(text, kaid, cookies) {
-    // TODO: parse commands better
-    let args = text.split(" ");
-    let command = args.splice(0, 1)[0].toLowerCase();
+    return new Promise((resolve, reject) => {
+        // TODO: parse commands better
+        let args = text.split(" ");
+        let command = args.splice(0, 1)[0].toLowerCase();
 
-    if(!(command in routes)) {
-        return `The command ${command} does not exist.`;
-    }
+        if(!(command in routes)) {
+            return `The command ${command} does not exist.`;
+        }
 
-    return routes[command](args, kaid, cookies);
+        return routes[command](args, kaid, cookies).catch(error => {
+            if(error instanceof CommandError) {
+                resolve(error.message);
+            } else {
+                resolve("An error occured. Try checking you command arguments?");
+            }
+        }).then(resolve);
+    });
 }
 
 module.exports = {
