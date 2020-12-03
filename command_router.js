@@ -1,37 +1,48 @@
-/**
- * This is a model that routes incoming command requests
- * 
- * Given the command text, it will route it to the appropiate function, and return a promise 
- */
+const {getCommentsOnComment, commentOnComment} = require("./comments");
+const {runCommand} = require("./command_router");
+const {getState, modifyState} = require("./state");
 
-const test = require("./commands/test");
-const createprogram = require("./commands/createprogram");
-const deleteprogram = require("./commands/deleteprogram");
-const programsettings = require("./commands/programsettings.js");
-const merge = require("./commands/merge");
-const contrib = require("./commands/contrib");
+async function pollCommands(commentId, cookies) {
+    const lastComment = (await getState()).lastComment;
 
-const routes = {
-    test,
-    createprogram,
-    deleteprogram,
-    programsettings,
-    merge,
-    contrib
-};
+    let allComments = await getCommentsOnComment(commentId);
 
-async function runCommand(text, kaid, cookies) {
-    // TODO: parse commands better
-    let args = text.split(" ");
-    let command = args.splice(0, 1)[0].toLowerCase();
+    let lastCommandExecutedIndex = allComments.findIndex(comment => {
+        return comment.key === lastComment;
+    });
 
-    if(!(command in routes)) {
-        return `The command ${command} does not exist.`;
+    // delete all commands already executed
+    if(lastCommandExecutedIndex !== -1) {
+        allComments.splice(0, lastCommandExecutedIndex + 1);
     }
 
-    return routes[command](args, kaid, cookies);
+    // get rid of comments by the bot
+    allComments = allComments.filter(comment => {
+        return comment.authorKaid != process.env.BOT_KAID;
+    }); 
+
+    let newLastComment = lastComment;
+
+    for(let i = 0; i < allComments.length; i++) {
+        let text = allComments[i].content;
+        let kaid = allComments[i].authorKaid;
+
+        newLastComment = allComments[i].key;
+
+        console.log(`Running command ${text} as user ${kaid}`);
+        
+        runCommand(text, kaid, cookies).then((function(response) {
+            commentOnComment(this.commentId, response, cookies);
+        }).bind({
+            commentId: commentId
+        }));
+    }
+    
+    await modifyState(function(state) {
+        state.lastComment = newLastComment;
+    });
 }
 
 module.exports = {
-    runCommand
+    pollCommands
 };
