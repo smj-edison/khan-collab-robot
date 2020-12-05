@@ -1,6 +1,7 @@
 const {makeGetRequest} = require("./session");
 const axios = require("axios");
 const {cookiesToCookieString, getCookieValue} = require("./cookies");
+const {cullLongDiscussions} = require("./discussion_culling.js");
 
 async function getRootComment(programId, commentId) {
     const url = `https://www.khanacademy.org/api/internal/discussions/scratchpad/${programId}/comments?casing=camel&lang=en&qa_expand_key=${commentId}`;
@@ -29,7 +30,10 @@ async function getNotificationPost(notification) {
 
     let comments = await getCommentsOnAComment(feedbackHierarchy[feedbackHierarchy.length - 1]);
 
-    return comments.filter(comment => comment.expandKey === notification.feedback)[0];
+    return {
+        post: comments.find(comment => comment.expandKey === notification.feedback),
+        posts: comments
+    };
 }
 
 async function getBrandNewNotifications(cookies) {
@@ -67,17 +71,33 @@ async function clearNewNotifications(cookies) {
     });
 }
 
+async function deleteRootComment(cookies, commentKaencrypted) {
+    const url = `https://www.khanacademy.org/api/internal/feedback/${commentKaencrypted}?lang=en`;
+
+    return axios.delete(url, {
+        "headers": {
+            "Cookie": cookiesToCookieString(cookies),
+            "X-KA-FKey": getCookieValue(cookies, "fkey")
+        }
+    });
+}
+
 async function parseNotificationJSON(json) {
     var notificationType = json.class_[json.class_.length - 1];
 
     // ignore direct comments (as they can't be cascade deleted)
     if(notificationType === "ResponseFeedbackNotification") {
+        let {post, posts} = await getNotificationPost(json);
+        
+        // clean up long discussions
+        await cullLongDiscussions(posts.length, json.feedbackHierarchy[1]);
+
         return {
             type: "response-feedback",
             parentCommentId: json.feedbackHierarchy[1],
             commentId: json.feedbackHierarchy[0],
             value: json.content,
-            kaid: (await getNotificationPost(json)).authorKaid
+            kaid: post.authorKaid
         };
     }
 
