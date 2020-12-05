@@ -1,0 +1,3 @@
+# Contributing
+
+Fork and pull.
