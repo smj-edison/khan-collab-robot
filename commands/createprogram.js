@@ -5,8 +5,6 @@ const yargs = require('yargs/yargs');
 
 async function createprogram(args, kaid, cookies) {
     var args = yargs(args)
-        .count("width").alias("w", "width").default("width", 400)
-        .count("height").alias("h", "height").default("height", 400)
         .choices("type", ["pjs", "webpage", "sql"]).alias("t", "type").default("type", "pjs").argv;
 
     // create the program
