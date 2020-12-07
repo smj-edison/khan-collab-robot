@@ -1,12 +1,10 @@
-const {MAX_DISCUSSION_LENGTH, NEW_COMMENT_TEXT} = require("./constants.js");
-const {modifyState} = require("./state.js");
-const {commentAtRoot, commentOnComment} = require("./comments.js");
+const {MAX_DISCUSSION_LENGTH, NEW_COMMENT_TEXT, TIME_UNTIL_DELETED} = require("./constants.js");
+const {modifyState, getState} = require("./state.js");
+const {commentAtRoot, commentOnComment, deleteRootComment} = require("./comments.js");
 
-
-async function cullLongDiscussions(cookies, discussionLength, programId, discussionParentExpandKey) {
+async function markDiscussionOld(cookies, discussionLength, programId, discussionParentExpandKey) {
     if(discussionLength > MAX_DISCUSSION_LENGTH) {
-        //const parentDetails = await getProgramCommentDetails(programId, discussionParentExpandKey);
-        //const commentKey = parentDetails.qaExpandKey;
+        
         let shouldComment = true;
 
         await modifyState(state => {
@@ -22,7 +20,8 @@ async function cullLongDiscussions(cookies, discussionLength, programId, discuss
 
             state.queuedDeletions.push({
                 date: (new Date()).toISOString(),
-                discussionExpandKey: discussionParentExpandKey
+                discussionExpandKey: discussionParentExpandKey,
+                programId
             });
 
             state.queuedDeletions.sort((a, b) => a.date.localeCompare(b.date));
@@ -37,6 +36,35 @@ async function cullLongDiscussions(cookies, discussionLength, programId, discuss
     }
 }
 
+function discussionIsOld(queuedDeletion) {
+    let queuedDate = new Date(queuedDeletion.date);
+    let now = Date.now();
+    
+    return now > queuedDate + TIME_UNTIL_DELETED;
+}
+
+async function checkForAndDeleteOldDiscussions(cookies) {
+    // get all discussions queued for deletion
+    let queuedDeletions = (await getState()).queuedDeletions;
+    queuedDeletions.sort((a, b) => a.date.localeCompare(b.date));
+
+    let deleting = [];
+
+    while(discussionIsOld(queuedDeletions[0])) {
+        const parentDetails = await getProgramCommentDetails(programId, discussionParentExpandKey);
+        const commentKey = parentDetails.qaExpandKey;
+
+        deleting.push(deleteRootComment(cookies, commentKey));
+
+        queuedDeletions.splice(0, 1);
+    }
+
+    await Promise.all(deleting);
+}
+
+
+
 module.exports = {
-    cullLongDiscussions
+    markDiscussionOld,
+    checkForAndDeleteOldDiscussions
 };
