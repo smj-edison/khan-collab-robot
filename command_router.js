@@ -32,7 +32,9 @@ async function runCommand(text, kaid, cookies) {
             return `The command ${command} does not exist.`;
         }
 
-        return routes[command](args, kaid, cookies).catch(error => {
+        const commandResult = routes[command](args, kaid, cookies);
+
+        return Promise.resolve(commandResult).catch(error => {
             if(error instanceof CommandError) {
                 resolve(error.message);
             } else {
