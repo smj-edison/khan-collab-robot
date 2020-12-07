@@ -110,12 +110,12 @@ async function getAndParseNewNotifications(cookies) {
     const clearNotifPromise = clearNewNotifications(cookies);
 
     // no need to wait for the response for calculation this
-    const parsedNotifs = (await Promise.all(notifications.map(parseNotificationJSON))).filter(notif => notif !== null);
+    const parsedNotifs = notifications.map(parseNotificationJSON).filter(notif => notif !== null);
 
-    parsedNotifs.forEach(notif => {
+    await Promise.all(parsedNotifs.map(async notif => {
         // clean up long discussions
         await cullLongDiscussions(cookies, notif.postsInDiscussion, notif.programId, notif.parentCommentId);
-    });
+    }));
 
     await clearNotifPromise;
     return parsedNotifs;
