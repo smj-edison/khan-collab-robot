@@ -89,7 +89,7 @@ async function parseNotificationJSON(json) {
     if(notificationType === "ResponseFeedbackNotification") {
         let {post, posts} = await getNotificationPost(json);
 
-        const programId = json.scratchpadRelativeUrl.substring(json.scratchpadRelativeUrl.lastIndexOf("/") + 1);
+        const programId = json.url.match(/\d+(?=\?)/)[0];
 
         return {
             type: "response-feedback",
@@ -110,7 +110,7 @@ async function getAndParseNewNotifications(cookies) {
     const clearNotifPromise = clearNewNotifications(cookies);
 
     // no need to wait for the response for calculation this
-    const parsedNotifs = notifications.map(parseNotificationJSON).filter(notif => notif !== null);
+    const parsedNotifs = (await Promise.all(notifications.map(parseNotificationJSON))).filter(notif => notif !== null);
 
     await Promise.all(parsedNotifs.map(async notif => {
         // clean up long discussions
