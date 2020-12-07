@@ -31,6 +31,14 @@ async function getProgramComments(programId) {
     });
 }
 
+async function getProgramCommentDetails(programId, commentExpandKey) {
+    let url = `https://www.khanacademy.org/api/internal/discussions/scratchpad/${programId}/comments?casing=camel&qa_expand_key=${commentExpandKey}&lang=en`;
+
+    return axios.get(url).then(response => {
+        return response.data;
+    });
+}
+
 async function getCommentsOnComment(commentId) {
     let url = `https://www.khanacademy.org/api/internal/discussions/${commentId}/replies?casing=camel&lang=en`;
     
@@ -43,5 +51,6 @@ module.exports = {
     commentAtRoot,
     commentOnComment,
     getProgramComments,
+    getProgramCommentDetails,
     getCommentsOnComment
 };
