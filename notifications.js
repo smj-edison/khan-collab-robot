@@ -1,7 +1,7 @@
 const {makeGetRequest} = require("./session");
 const axios = require("axios");
 const {cookiesToCookieString, getCookieValue} = require("./cookies");
-const {cullLongDiscussions} = require("./discussion_culling.js");
+const {markDiscussionOld} = require("./discussion_culling.js");
 
 async function getRootComment(programId, commentId) {
     const url = `https://www.khanacademy.org/api/internal/discussions/scratchpad/${programId}/comments?casing=camel&lang=en&qa_expand_key=${commentId}`;
@@ -71,17 +71,6 @@ async function clearNewNotifications(cookies) {
     });
 }
 
-async function deleteRootComment(cookies, commentKaencrypted) {
-    const url = `https://www.khanacademy.org/api/internal/feedback/${commentKaencrypted}?lang=en`;
-
-    return axios.delete(url, {
-        "headers": {
-            "Cookie": cookiesToCookieString(cookies),
-            "X-KA-FKey": getCookieValue(cookies, "fkey")
-        }
-    });
-}
-
 async function parseNotificationJSON(json) {
     var notificationType = json.class_[json.class_.length - 1];
 
@@ -114,7 +103,7 @@ async function getAndParseNewNotifications(cookies) {
 
     await Promise.all(parsedNotifs.map(async notif => {
         // clean up long discussions
-        await cullLongDiscussions(cookies, notif.postsInDiscussion, notif.programId, notif.parentCommentId);
+        await markDiscussionOld(cookies, notif.postsInDiscussion, notif.programId, notif.parentCommentId);
     }));
 
     await clearNotifPromise;

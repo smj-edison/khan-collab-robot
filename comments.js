@@ -47,10 +47,22 @@ async function getCommentsOnComment(commentId) {
     });
 }
 
+async function deleteRootComment(cookies, commentKaencrypted) {
+    const url = `https://www.khanacademy.org/api/internal/feedback/${commentKaencrypted}?lang=en`;
+
+    return axios.delete(url, {
+        "headers": {
+            "Cookie": cookiesToCookieString(cookies),
+            "X-KA-FKey": getCookieValue(cookies, "fkey")
+        }
+    });
+}
+
 module.exports = {
     commentAtRoot,
     commentOnComment,
     getProgramComments,
     getProgramCommentDetails,
-    getCommentsOnComment
+    getCommentsOnComment,
+    deleteRootComment
 };
