@@ -88,16 +88,17 @@ async function parseNotificationJSON(json) {
     // ignore direct comments (as they can't be cascade deleted)
     if(notificationType === "ResponseFeedbackNotification") {
         let {post, posts} = await getNotificationPost(json);
-        
-        // clean up long discussions
-        await cullLongDiscussions(posts.length, json.feedbackHierarchy[1]);
+
+        const programId = json.scratchpadRelativeUrl.substring(json.scratchpadRelativeUrl.lastIndexOf("/") + 1);
 
         return {
             type: "response-feedback",
             parentCommentId: json.feedbackHierarchy[1],
             commentId: json.feedbackHierarchy[0],
             value: json.content,
-            kaid: post.authorKaid
+            kaid: post.authorKaid,
+            programId: programId,
+            postsInDiscussion: posts.length
         };
     }
 
@@ -110,6 +111,11 @@ async function getAndParseNewNotifications(cookies) {
 
     // no need to wait for the response for calculation this
     const parsedNotifs = (await Promise.all(notifications.map(parseNotificationJSON))).filter(notif => notif !== null);
+
+    parsedNotifs.forEach(notif => {
+        // clean up long discussions
+        await cullLongDiscussions(cookies, notif.postsInDiscussion, notif.programId, notif.parentCommentId);
+    });
 
     await clearNotifPromise;
     return parsedNotifs;
