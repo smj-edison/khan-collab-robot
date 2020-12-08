@@ -1,5 +1,6 @@
 const axios = require("axios");
 const {makePostRequest} = require("./session");
+const {cookiesToCookieString, getCookieValue} = require("./cookies");
 
 async function commentAtRoot(programId, text, cookies) {
     var commentJSON = {
@@ -31,6 +32,14 @@ async function getProgramComments(programId) {
     });
 }
 
+async function getProgramCommentDetails(programId, commentExpandKey) {
+    let url = `https://www.khanacademy.org/api/internal/discussions/scratchpad/${programId}/comments?casing=camel&qa_expand_key=${commentExpandKey}&lang=en`;
+
+    return axios.get(url).then(response => {
+        return response.data;
+    });
+}
+
 async function getCommentsOnComment(commentId) {
     let url = `https://www.khanacademy.org/api/internal/discussions/${commentId}/replies?casing=camel&lang=en`;
     
@@ -39,9 +48,22 @@ async function getCommentsOnComment(commentId) {
     });
 }
 
+async function deleteRootComment(cookies, commentKaencrypted) {
+    const url = `https://www.khanacademy.org/api/internal/feedback/${commentKaencrypted}?lang=en`;
+
+    return axios.delete(url, {
+        "headers": {
+            "Cookie": cookiesToCookieString(cookies),
+            "X-KA-FKey": getCookieValue(cookies, "fkey")
+        }
+    });
+}
+
 module.exports = {
     commentAtRoot,
     commentOnComment,
     getProgramComments,
-    getCommentsOnComment
+    getProgramCommentDetails,
+    getCommentsOnComment,
+    deleteRootComment
 };

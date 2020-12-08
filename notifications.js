@@ -1,6 +1,7 @@
 const {makeGetRequest} = require("./session");
 const axios = require("axios");
 const {cookiesToCookieString, getCookieValue} = require("./cookies");
+const {markDiscussionOld} = require("./discussion_culling.js");
 
 async function getRootComment(programId, commentId) {
     const url = `https://www.khanacademy.org/api/internal/discussions/scratchpad/${programId}/comments?casing=camel&lang=en&qa_expand_key=${commentId}`;
@@ -29,7 +30,10 @@ async function getNotificationPost(notification) {
 
     let comments = await getCommentsOnAComment(feedbackHierarchy[feedbackHierarchy.length - 1]);
 
-    return comments.filter(comment => comment.expandKey === notification.feedback)[0];
+    return {
+        post: comments.find(comment => comment.expandKey === notification.feedback),
+        posts: comments
+    };
 }
 
 async function getBrandNewNotifications(cookies) {
@@ -72,12 +76,18 @@ async function parseNotificationJSON(json) {
 
     // ignore direct comments (as they can't be cascade deleted)
     if(notificationType === "ResponseFeedbackNotification") {
+        let {post, posts} = await getNotificationPost(json);
+
+        const programId = json.url.match(/\d+(?=\?)/)[0];
+
         return {
             type: "response-feedback",
             parentCommentId: json.feedbackHierarchy[1],
             commentId: json.feedbackHierarchy[0],
             value: json.content,
-            kaid: (await getNotificationPost(json)).authorKaid
+            kaid: post.authorKaid,
+            programId: programId,
+            postsInDiscussion: posts.length
         };
     }
 
@@ -90,6 +100,11 @@ async function getAndParseNewNotifications(cookies) {
 
     // no need to wait for the response for calculation this
     const parsedNotifs = (await Promise.all(notifications.map(parseNotificationJSON))).filter(notif => notif !== null);
+
+    await Promise.all(parsedNotifs.map(async notif => {
+        // clean up long discussions
+        await markDiscussionOld(cookies, notif.postsInDiscussion, notif.programId, notif.parentCommentId);
+    }));
 
     await clearNotifPromise;
     return parsedNotifs;

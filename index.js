@@ -3,6 +3,7 @@
 const {login} = require("./session");
 const {updateProgram} = require("./programs");
 const {pollCommandsFromNotifications} = require("./poll_commands");
+const {checkForAndDeleteOldDiscussions} = require("./discussion_culling");
 
 let username = process.env.USERNAME;
 let password = process.env.PASSWORD;
@@ -12,6 +13,7 @@ function checkForNewCommands(cookies) {
 
     // TODO: crappy job here
     pollCommandsFromNotifications(cookies);
+    checkForAndDeleteOldDiscussions(cookies);
 }
 
 //capture results so that they aren't printed to the console
