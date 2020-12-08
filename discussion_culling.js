@@ -1,10 +1,9 @@
 const {MAX_DISCUSSION_LENGTH, NEW_COMMENT_TEXT, TIME_UNTIL_DELETED} = require("./constants.js");
 const {modifyState, getState} = require("./state.js");
-const {commentAtRoot, commentOnComment, deleteRootComment} = require("./comments.js");
+const {commentAtRoot, commentOnComment, deleteRootComment, getProgramCommentDetails} = require("./comments.js");
 
 async function markDiscussionOld(cookies, discussionLength, programId, discussionParentExpandKey) {
-    if(discussionLength > MAX_DISCUSSION_LENGTH) {
-        
+    if(discussionLength > MAX_DISCUSSION_LENGTH) {        
         let shouldComment = true;
 
         await modifyState(state => {
@@ -38,28 +37,43 @@ async function markDiscussionOld(cookies, discussionLength, programId, discussio
 
 function discussionIsOld(queuedDeletion) {
     let queuedDate = new Date(queuedDeletion.date);
-    let now = Date.now();
+    let queuedDateOffset = new Date(queuedDate.getTime() + TIME_UNTIL_DELETED);
+    let now = new Date();
     
-    return now > queuedDate + TIME_UNTIL_DELETED;
+    return now > queuedDateOffset;
 }
 
 async function checkForAndDeleteOldDiscussions(cookies) {
     // get all discussions queued for deletion
-    let queuedDeletions = (await getState()).queuedDeletions;
+    let queuedDeletions = (await getState()).queuedDeletions || [];
     queuedDeletions.sort((a, b) => a.date.localeCompare(b.date));
 
-    let deleting = [];
+    let waitFor = [];
 
-    while(discussionIsOld(queuedDeletions[0])) {
-        const parentDetails = await getProgramCommentDetails(programId, discussionParentExpandKey);
+    while(queuedDeletions.length > 0 && discussionIsOld(queuedDeletions[0])) {
+        const toDelete = queuedDeletions[0];
+
+        const parentDetails = await getProgramCommentDetails(toDelete.programId, toDelete.discussionExpandKey);
         const commentKey = parentDetails.qaExpandKey;
 
-        deleting.push(deleteRootComment(cookies, commentKey));
+        waitFor.push(deleteRootComment(cookies, commentKey));
 
-        queuedDeletions.splice(0, 1);
+        queuedDeletions.splice(0, 1); // remove it in both places
+
+        waitFor.push(modifyState(state => {
+            state.queuedDeletions = state.queuedDeletions || [];
+
+            const queuedDelationIndex = state.queuedDeletions.findIndex(queuedDeletion => {
+                return queuedDeletion.discussionExpandKey === toDelete.discussionExpandKey;
+            });
+
+            state.queuedDeletions.splice(queuedDelationIndex, 1);
+        }));
+
+        console.log("deleted thread");
     }
 
-    await Promise.all(deleting);
+    await Promise.all(waitFor);
 }
 
 
