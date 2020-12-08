@@ -35,7 +35,7 @@ async function runCommand(text, kaid, cookies) {
         const commandResult = routes[command](args, kaid, cookies);
 
         return Promise.resolve(commandResult).catch(error => {
-            if(error instanceof CommandError) {
+            if(error.name === "CommandError") {
                 resolve(error.message);
             } else {
                 resolve("An error occured. Try checking you command arguments?");
