@@ -1,5 +1,6 @@
 const axios = require("axios");
 const {makePostRequest} = require("./session");
+const {cookiesToCookieString, getCookieValue} = require("./cookies");
 
 async function commentAtRoot(programId, text, cookies) {
     var commentJSON = {
