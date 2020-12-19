@@ -64,7 +64,13 @@ async function updateProgram(cookies, programId, code, settings={}, programJson)
 
     let url = `https://www.khanacademy.org/api/internal/scratchpads/${programId}?client_dt=${getQueryTime()}&lang=en`;
     
-    return makePutRequest(url, jsonToSend, cookies);
+    return makePutRequest(url, jsonToSend, cookies).catch(error => {
+        if(error.response.status === 403) {
+            throw new CommandError(`The program ${programId} is not owned by bors.`);
+        } else {
+            throw error;
+        }
+    });
 }
 
 async function newProgram(cookies, code, settings={}, type) {
