@@ -132,7 +132,15 @@ async function spinOffProgram(cookies, originalProgram, code, settings={}, origi
 async function deleteProgram(cookies, programId) {
     let url = `https://www.khanacademy.org/api/internal/scratchpads/${programId}?client_dt=${getQueryTime()}&lang=en`;
     
-    return makeDeleteRequest(url, cookies);
+    return makeDeleteRequest(url, cookies).catch(error => {
+        if(error.response.status === 404) {
+            throw new CommandError(`The program ${programId} doesn't exist.`);
+        } else if(error.response.status === 403) {
+            throw new CommandError(`The program ${programId} is not owned by bors`);
+        } else {
+            throw error;
+        }
+    });
 }
 
 async function getProgramCodeAndHeaders(id) {
