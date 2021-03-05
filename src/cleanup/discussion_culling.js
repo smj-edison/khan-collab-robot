@@ -55,7 +55,7 @@ async function removeFromQueue(discussionExpandKey) {
         state.queuedDeletions = state.queuedDeletions || [];
 
         const queuedDeletionIndex = state.queuedDeletions.findIndex(queuedDeletion => {
-            return queuedDeletion.discussionExpandKey === toDelete.discussionExpandKey;
+            return queuedDeletion.discussionExpandKey === discussionExpandKey;
         });
 
         state.queuedDeletions.splice(queuedDeletionIndex, 1);
@@ -100,6 +100,6 @@ async function checkForAndDeleteOldDiscussions(cookies) {
 
 
 module.exports = {
-    markDiscussionOld,
+    checkAndMarkDiscussionOld,
     checkForAndDeleteOldDiscussions
 };
