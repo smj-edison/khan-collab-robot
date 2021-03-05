@@ -2,6 +2,7 @@ const axios = require("axios");
 const {makePutRequest, makePostRequest, makeDeleteRequest} = require("./session");
 const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = require("./program_header");
 const PROGRAM_DEFAULT_JSON = require("./constants").PROGRAM_SAVE_JSON_DEFAULT;
+const {CommandError} = require("./command_error");
 
 /**
  * A helper function that returns the current time formatted for KA's servers
@@ -25,6 +26,12 @@ async function getProgramJSON(id) {
     return axios.get("https://www.khanacademy.org/api/internal/scratchpads/" + id)
                 .then(response => {
                     return response.data;
+                }).catch(error => {
+                    if(error.response.status === 404) {
+                        throw new CommandError(`The program "${id}" does not exist. Make sure that the program ID is valid.`);
+                    } else {
+                        throw error; // propigate the error
+                    }
                 });
 }
 
@@ -57,7 +64,13 @@ async function updateProgram(cookies, programId, code, settings={}, programJson)
 
     let url = `https://www.khanacademy.org/api/internal/scratchpads/${programId}?client_dt=${getQueryTime()}&lang=en`;
     
-    return makePutRequest(url, jsonToSend, cookies);
+    return makePutRequest(url, jsonToSend, cookies).catch(error => {
+        if(error.response.status === 403) {
+            throw new CommandError(`The program ${programId} is not owned by bors.`);
+        } else {
+            throw error;
+        }
+    });
 }
 
 async function newProgram(cookies, code, settings={}, type) {
@@ -119,7 +132,15 @@ async function spinOffProgram(cookies, originalProgram, code, settings={}, origi
 async function deleteProgram(cookies, programId) {
     let url = `https://www.khanacademy.org/api/internal/scratchpads/${programId}?client_dt=${getQueryTime()}&lang=en`;
     
-    return makeDeleteRequest(url, cookies);
+    return makeDeleteRequest(url, cookies).catch(error => {
+        if(error.response.status === 404) {
+            throw new CommandError(`The program ${programId} doesn't exist.`);
+        } else if(error.response.status === 403) {
+            throw new CommandError(`The program ${programId} is not owned by bors`);
+        } else {
+            throw error;
+        }
+    });
 }
 
 async function getProgramCodeAndHeaders(id) {

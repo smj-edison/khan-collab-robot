@@ -6,7 +6,7 @@ async function addContributor(args, kaid, cookies) {
     const newContributor = args[0];
     const programId = args[1];
 
-    const newContributorKaid = await getKaidFromUsername(newContributor);
+    const newContributorKaid = await getKaidFromUsername(cookies, newContributor);
     const [codeHeaders, code] = await getProgramCodeAndHeaders(programId);
 
     if(!isAuthor(codeHeaders, kaid)) {

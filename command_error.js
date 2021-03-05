@@ -1,9 +1,14 @@
 function CommandError(message) {
-    this.message = message;
-    this.stack = Error().stack;
+    var error = Error.call(this, message);
+  
+    this.name = "CommandError";
+    this.message = error.message;
+    this.stack = error.stack;
 }
 
 CommandError.prototype = Object.create(Error.prototype);
-CommandError.prototype.name = "CommandError";
+CommandError.prototype.constructor = CommandError;
 
-module.exports = CommandError;
+module.exports = {
+    CommandError
+};
