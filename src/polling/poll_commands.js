@@ -1,7 +1,7 @@
 const {getCommentsOnComment, commentOnComment} = require("./comments");
-const {runCommand} = require("./command_router");
-const {getState, modifyState} = require("./state");
-const {getAndParseNewNotifications} = require("./notifications.js");
+const {runCommand} = require("../command_router");
+const {getState, modifyState} = require("../state");
+const {getAndParseNewNotifications} = require("../notifications/notifications.js");
 
 async function pollCommands(commentId, cookies) {
     const lastComment = (await getState()).lastComment;

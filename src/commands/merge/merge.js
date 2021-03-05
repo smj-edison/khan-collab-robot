@@ -1,5 +1,5 @@
-const {updateProgramCodeAndHeaders, getProgramCodeAndHeaders, spinOffProgramCodeAndHeaders, deleteProgram, getProgramJSON} = require("../../programs");
-const {isAuthor, isContributor} = require("../../authorization");
+const {updateProgramCodeAndHeaders, getProgramCodeAndHeaders, spinOffProgramCodeAndHeaders, deleteProgram, getProgramJSON} = require("../../metadata/programs");
+const {isAuthor, isContributor} = require("../../authorization/authorization");
 const {loadProgramHistory, updateProgramHistory} = require("../../../program_history");
 const uuidv1 = require("uuid").v1;
 const Diff3 = require("node-diff3");

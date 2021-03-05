@@ -1,5 +1,5 @@
-const {MAX_DISCUSSION_LENGTH, NEW_COMMENT_TEXT, TIME_UNTIL_DELETED} = require("./constants.js");
-const {modifyState, getState} = require("./state.js");
+const {MAX_DISCUSSION_LENGTH, NEW_COMMENT_TEXT, TIME_UNTIL_DELETED} = require("../constants.js");
+const {modifyState, getState} = require("../state.js");
 const {commentAtRoot, commentOnComment, deleteRootComment, getProgramCommentDetails} = require("./comments.js");
 
 async function markDiscussionOld(cookies, discussionLength, programId, discussionParentExpandKey) {

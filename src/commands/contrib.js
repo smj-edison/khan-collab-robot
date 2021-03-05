@@ -1,6 +1,6 @@
 const {getKaidFromUsername} = require("../profile");
-const {getProgramCodeAndHeaders, updateProgramCodeAndHeaders} = require("../programs");
-const {isAuthor} = require("../authorization");
+const {getProgramCodeAndHeaders, updateProgramCodeAndHeaders} = require("../metadata/programs");
+const {isAuthor} = require("../authorization/authorization");
 
 async function addContributor(args, kaid, cookies) {
     const newContributor = args[0];

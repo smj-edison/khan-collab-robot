@@ -1,5 +1,5 @@
-const {newProgram, changeProgramHeaders} = require("../programs");
-const {generateProgramHeaders} = require("../program_header");
+const {newProgram, changeProgramHeaders} = require("../metadata/programs");
+const {generateProgramHeaders} = require("../metadata/program_header");
 const PROGRAM_DEFAULT_JSON = require("../constants").PROGRAM_SAVE_JSON_DEFAULT;
 const yargs = require('yargs/yargs');
 

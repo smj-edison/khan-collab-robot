@@ -2,7 +2,7 @@ const {
     PROGRAM_HEADER_START_STRING_PJS,
     PROGRAM_HEADER_START_STRING_WEBPAGE,
     PROGRAM_HEADER_START_STRING_SQL
-} = require("./constants");
+} = require("../constants");
 
 function parseProgramHeaders(code, type) {
     let startOfHeaders = null;

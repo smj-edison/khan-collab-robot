@@ -11,7 +11,7 @@ const programsettings = require("./src/commands/programsettings.js.js");
 const merge = require("./commands/merge/merge.js");
 const contrib = require("./commands/contrib");
 
-const CommandError = require("./command_error.js");
+const CommandError = require("./error/command_error.js");
 
 const routes = {
     test,
