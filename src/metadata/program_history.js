@@ -7,7 +7,7 @@ async function loadProgramHistory(programId) {
 }
 
 async function updateProgramHistory(cookies, programId, json) {
-    await updateProgram(cookies, programId, JSON.stringify(json));
+    return await updateProgram(cookies, programId, JSON.stringify(json));
 }
 
 module.exports = {
