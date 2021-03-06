@@ -1,9 +1,6 @@
-const axios = require("axios");
-const {makePutRequest, makePostRequest, makeDeleteRequest} = require("./session");
-const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = require("./program_header");
-const PROGRAM_DEFAULT_JSON = require("../constants").PROGRAM_SAVE_JSON_DEFAULT;
-const {CommandError} = require("../error/command_error");
+const {getProgramJSON} = require("ka-api").programs;
 
+const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = require("./program_header.js");
 
 async function getProgramCodeAndHeaders(id) {
     const program = await getProgramJSON(id);
@@ -13,7 +10,10 @@ async function getProgramCodeAndHeaders(id) {
     const codeHeaders = parseProgramHeaders(codeRaw, program.userAuthoredContentType);
     const code = stripProgramHeaders(codeRaw, program.userAuthoredContentType);
 
-    return [codeHeaders, code];
+    return {
+        codeHeaders,
+        code
+    };
 }
 
 async function updateProgramCodeAndHeaders(cookies, programId, codeHeaders, code, settings={}) {
@@ -33,19 +33,15 @@ async function spinOffProgramCodeAndHeaders(cookies, originalProgramId, codeHead
 }
 
 async function changeProgramHeaders(cookies, programId, lambdaThatWillChangeHeaders) {
-    let [headers, code] = await getProgramCodeAndHeaders(programId);
+    let {codeHeaders, code} = await getProgramCodeAndHeaders(programId);
 
-    lambdaThatWillChangeHeaders(headers);
+    lambdaThatWillChangeHeaders(codeHeaders);
 
-    await updateProgramCodeAndHeaders(cookies, programId, headers, code);
+    await updateProgramCodeAndHeaders(cookies, programId, codeHeaders, code);
 }
 
 module.exports = {
     getProgramJSON,
-    updateProgram,
-    spinOffProgram,
-    newProgram,
-    deleteProgram,
     getProgramCodeAndHeaders,
     updateProgramCodeAndHeaders,
     changeProgramHeaders,

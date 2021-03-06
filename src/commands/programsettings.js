@@ -15,9 +15,9 @@ async function programsettings(args, kaid, cookies) {
     }
 
     // make sure they own the program
-    const [headers, code] = await getProgramCodeAndHeaders(parsedArgs._[0]);
+    const {codeHeaders} = await getProgramCodeAndHeaders(parsedArgs._[0]);
 
-    if(!isAuthor(headers, kaid)) {
+    if(!isAuthor(codeHeaders, kaid)) {
         return "You are not authorized to do this.";
     }
     

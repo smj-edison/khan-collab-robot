@@ -100,7 +100,7 @@ async function resolveConflict(cookies, programHistory, programBranchId, program
     // the program that showed all the conflicts
     const conflictProgram = branchJSON.originScratchpadId;
 
-    const [conflictProgramHeaders, _] = await getProgramCodeAndHeaders(conflictProgram);
+    const {headers: conflictProgramHeaders} = await getProgramCodeAndHeaders(conflictProgram);
 
     // make sure that the program is actually conflicted, and not just trying to delete someone else's program
     if(conflictProgramHeaders.conflict === "true") {
@@ -114,8 +114,8 @@ async function merge(args, kaid, cookies) {
     const programBranch = args[0]; // the new code
     const programMaster = args[1]; // the program being merged into
 
-    let [branchHeaders, branchCode] = await getProgramCodeAndHeaders(programBranch);
-    let [masterHeaders, masterCode] = await getProgramCodeAndHeaders(programMaster);
+    let {codeHeaders: branchHeaders, code: branchCode} = await getProgramCodeAndHeaders(programBranch);
+    let {codeHeaders: masterHeaders, code: masterCode} = await getProgramCodeAndHeaders(programMaster);
 
     let programHistory = await loadProgramHistory(masterHeaders.historyprogramid);
     if(!programHistory.merges) programHistory.merges = [];
