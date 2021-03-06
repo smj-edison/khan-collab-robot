@@ -4,20 +4,104 @@ const {
     PROGRAM_HEADER_START_STRING_SQL
 } = require("../constants");
 
-function parseProgramHeaders(code, type) {
-    let startOfHeaders = null;
-
+function findStartIndex(code, type) {
     switch(type) {
         case "pjs":
-            startOfHeaders = code.indexOf(PROGRAM_HEADER_START_STRING_PJS) + PROGRAM_HEADER_START_STRING_PJS.length;
-        break;
+            return code.indexOf(PROGRAM_HEADER_START_STRING_PJS) + PROGRAM_HEADER_START_STRING_PJS.length;
         case "webpage":
-            startOfHeaders = code.indexOf(PROGRAM_HEADER_START_STRING_WEBPAGE) + PROGRAM_HEADER_START_STRING_WEBPAGE.length;
-        break;
+            return code.indexOf(PROGRAM_HEADER_START_STRING_WEBPAGE) + PROGRAM_HEADER_START_STRING_WEBPAGE.length;
         case "sql":
-            startOfHeaders = code.indexOf(PROGRAM_HEADER_START_STRING_SQL) + PROGRAM_HEADER_START_STRING_SQL.length;
-        break;
+            return code.indexOf(PROGRAM_HEADER_START_STRING_SQL) + PROGRAM_HEADER_START_STRING_SQL.length;
     }
+}
+
+function parseHeadersPjs(headerString) {
+    let headers = {};
+
+    return headerString.split("\n").map(headerRow => {
+        const commentIndex = headerRow.indexOf("//");
+        
+        // if the line has a "//"
+        if(commentIndex > -1) {
+            // split the line by a ":"
+            const keyValueString = headerRow.substring(commentIndex + 2);
+            const keyValue = keyValueString.split(":");
+
+            const key = keyValue[0].trim();
+            const value = decodeURIComponent(keyValue[1].trim());
+
+            return [key, value];
+        }
+
+        // else, disregard line
+    }).reduce((acc, val) => {acc[val[0]] = val[1]; return acc}, {}); // convert [["key", "value"]] to {"key": "value"}
+}
+
+function parseHeadersPjs(headerString) {
+    return headerString.split("\n").map(headerRow => {
+        const commentIndex = headerRow.indexOf("//");
+        
+        // if the line has a "//"
+        if(commentIndex > -1) {
+            // split the line by a ":"
+            const keyValueString = headerRow.substring(commentIndex + 2);
+            const keyValue = keyValueString.split(":");
+
+            const key = keyValue[0].trim();
+            const value = decodeURIComponent(keyValue[1].trim());
+
+            return [key, value];
+        }
+
+        // else, disregard line
+    }).reduce((acc, val) => {acc[val[0]] = val[1]; return acc}, {}); // convert [["key", "value"]] to {"key": "value"}
+}
+
+function parseHeadersWebpage(headerString) {
+    return headerString.split("\n").map(headerRow => {
+        const commentIndex = headerRow.indexOf("<!--");
+        const endCommentIndex = headerRow.indexOf("-->");
+        
+        // if the line has a "<!--"
+        if(commentIndex > -1) {
+            // split the line by a ":"
+            const keyValueString = headerRow.substring(commentIndex + 4, endCommentIndex);
+
+            const keyValue = keyValueString.split(":");
+
+            const key = keyValue[0].trim();
+            const value = decodeURIComponent(keyValue[1].trim());
+
+            return [key, value];
+        }
+
+        // else, disregard line
+    }).reduce((acc, [key, value]) => {acc[key] = value; return acc}, {});
+}
+
+function parseHeadersSql(headerString) {
+    return headerString.split("\n").map(headerRow => {
+        const commentIndex = headerRow.indexOf("--");
+        
+        // if the line has a "--"
+        if(commentIndex > -1) {
+            // split the line by a ":"
+            const keyValueString = headerRow.substring(commentIndex + 2);
+            const keyValue = keyValueString.split(":");
+
+            const key = keyValue[0].trim();
+            const value = decodeURIComponent(keyValue[1].trim());
+
+            return [key, value];
+        }
+
+        // else, disregard line
+    }).reduce((acc, val) => {acc[val[0]] = val[1]; return acc}, {}); // convert [["key", "value"]] to {"key": "value"}
+}
+
+function parseProgramHeaders(code, type) {
+    // find where the headers start
+    let startOfHeaders = findStartIndex(code, type);
 
     let headerString;
     
@@ -29,74 +113,15 @@ function parseProgramHeaders(code, type) {
         headerString = code.trim();
     }
 
-    let headers = {};
-
     // split the headers by each line
-
     switch(type) {
         case "pjs":
-            headerString.split("\n").forEach(headerRow => {
-                const commentIndex = headerRow.indexOf("//");
-                
-                // if the line has a "//"
-                if(commentIndex > -1) {
-                    // split the line by a ":"
-                    const keyValueString = headerRow.substring(commentIndex + 2);
-                    const keyValue = keyValueString.split(":");
-        
-                    const key = keyValue[0].trim();
-                    const value = decodeURIComponent(keyValue[1].trim());
-        
-                    headers[key] = value;
-                }
-        
-                // else, disregard line
-            });
-        break;
+            return parseHeadersPjs(headerString);
         case "webpage":
-            headerString.split("\n").forEach(headerRow => {
-                const commentIndex = headerRow.indexOf("<!--");
-                const endCommentIndex = headerRow.indexOf("-->");
-                
-                // if the line has a "<!--"
-                if(commentIndex > -1) {
-                    // split the line by a ":"
-                    const keyValueString = headerRow.substring(commentIndex + 4, endCommentIndex);
-
-                    const keyValue = keyValueString.split(":");
-        
-                    const key = keyValue[0].trim();
-                    const value = decodeURIComponent(keyValue[1].trim());
-        
-                    headers[key] = value;
-                }
-        
-                // else, disregard line
-            });
-        break;
-        case "webpage":
-            headerString.split("\n").forEach(headerRow => {
-                const commentIndex = headerRow.indexOf("--");
-                
-                // if the line has a "<!--"
-                if(commentIndex > -1) {
-                    // split the line by a ":"
-                    const keyValueString = headerRow.substring(commentIndex + 2);
-                    const keyValue = keyValueString.split(":");
-        
-                    const key = keyValue[0].trim();
-                    const value = decodeURIComponent(keyValue[1].trim());
-        
-                    headers[key] = value;
-                }
-        
-                // else, disregard line
-            });
-        break;
+            return parseHeadersWebpage(headerString);
+        case "sql":
+            return parseHeadersSql(headerString);
     }
-    
-
-    return headers;
 }
 
 function stripProgramHeaders(code, type) {
