@@ -32,8 +32,8 @@ async function spinOffProgramCodeAndHeaders(cookies, originalProgramId, codeHead
     return spinOffProgram(cookies, originalProgramId, codeWithHeaders, settings, originalProgramJson);
 }
 
-async function changeProgramHeaders(cookies, programId, lambdaThatWillChangeHeaders) {
-    let {codeHeaders, code} = await getProgramCodeAndHeaders(programId);
+async function updateProgramHeaders(cookies, programId, lambdaThatWillChangeHeaders) {
+    const {codeHeaders, code} = await getProgramCodeAndHeaders(programId);
 
     lambdaThatWillChangeHeaders(codeHeaders);
 
@@ -44,6 +44,6 @@ module.exports = {
     getProgramJSON,
     getProgramCodeAndHeaders,
     updateProgramCodeAndHeaders,
-    changeProgramHeaders,
+    updateProgramHeaders,
     spinOffProgramCodeAndHeaders
 };
