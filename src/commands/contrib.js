@@ -1,8 +1,20 @@
-const {getKaidFromUsername} = require("../profile");
+const {getProfileInfo} = require("ka-api").profile;
 const {getProgramCodeAndHeaders, updateProgramCodeAndHeaders} = require("../metadata/programs");
 const {isAuthor} = require("../authorization/authorization");
 
-async function addContributor(args, kaid, cookies) {
+const {CommandError} = require("../error/command_error.js");
+
+async function getKaidFromUsername(cookies, username) {
+    return getProfileInfo(cookies, username).then(result => {
+        if(Object.is(result.data.data.user, null)) {
+            throw new CommandError(`The username "${username}" does not exist. Make sure that you have the user's username and not their display name.`);
+        }
+
+        return result.data.data.user.kaid;
+    });
+}
+
+async function addContributor(cookies, args, kaid) {
     const newContributor = args[0];
     const programId = args[1];
 
@@ -26,10 +38,10 @@ async function addContributor(args, kaid, cookies) {
     return newContributor + " added as a contributor.";
 }
 
-async function contrib(args, kaid, cookies) {
+async function contrib(cookies, args, kaid) {
     switch(args[0]) {
         case "add":
-            return addContributor(args.slice(1), kaid, cookies);
+            return addContributor(cookies, args.slice(1), kaid);
         break;
     }
 }

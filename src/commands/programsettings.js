@@ -5,7 +5,7 @@ const {isAuthor} = require("../authorization/authorization.js");
 
 const yargs = require('yargs/yargs');
 
-async function programsettings(args, kaid, cookies) {
+async function programsettings(cookies, args, kaid) {
     var parsedArgs = yargs(args)
         .number("width").alias("w", "width")
         .number("height").alias("h", "height").argv;

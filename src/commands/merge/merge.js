@@ -40,7 +40,7 @@ async function getRevisionCode(programHistory, mergeId) {
     }
 }
 
-async function merge(args, kaid, cookies) {
+async function merge(cookies, args, kaid) {
     const {programBranchId, programMasterId} = parseArgs(args);
 
     // get headers and code for branch and master programs

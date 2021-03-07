@@ -1,6 +1,6 @@
 const {getAllBrandNewNotifications, clearBrandNewNotifications} = require("ka-api").notifications;
 const {getNotificationCommentDetails} = require("ka-api").notifications;
-const {markDiscussionOld} = require("../cleanup/discussion_culling.js");
+const {checkAndMarkDiscussionOld} = require("../cleanup/discussion_culling.js");
 
 async function parseNotificationJSON(notifJson) {
     const notificationType = notifJson.class_[notifJson.class_.length - 1];

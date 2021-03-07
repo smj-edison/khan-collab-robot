@@ -12,8 +12,8 @@ async function pollCommandsFromNotifications(cookies) {
 
         console.log(`Running command ${text} as user ${kaid}`);
 
-        runCommand(text, kaid, cookies).then((function(response) {
-            commentOnComment(this.commentId, response, cookies);
+        runCommand(cookies, text, kaid).then((function(response) {
+            commentOnComment(cookies, this.commentId, response);
         }).bind({
             commentId: notifications[i].parentCommentId
         }));
