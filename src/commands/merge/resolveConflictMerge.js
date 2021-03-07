@@ -14,15 +14,13 @@ function checkForMergeConflicts(code) {
     });
 }
 
-async function deleteBranch(branchId) {
+async function deleteBranch(cookies, branchId) {
     const branchJSON = await getProgramJSON(branchId);
 
     // the program that showed all the conflicts (aka the parent spinoff)
     const conflictProgram = branchJSON.originScratchpadId;
 
     const {codeHeaders: conflictProgramHeaders} = await getProgramCodeAndHeaders(conflictProgram);
-
-    console.log(conflictProgramHeaders);
 
     // make sure that the program is actually conflicted, and not just trying to delete someone else's program
     if(conflictProgramHeaders.conflict === "true") {
@@ -50,7 +48,7 @@ async function resolveConflictMerge(cookies, programHistory, programBranchId, pr
         updateProgramHistory(cookies, masterHeaders.historyprogramid, programHistory)
     ]);
 
-    await deleteBranch(programBranchId);
+    await deleteBranch(cookies, programBranchId);
 
     return `Conflict successfully resolved. Be sure to delete https://khanacademy.org/computer-programming/_/${programBranchId}`;
 }
