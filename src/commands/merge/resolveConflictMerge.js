@@ -7,7 +7,7 @@ const {updateProgramHistory} = require("../../metadata/program_history.js");
 const getNewMergeRecord = require("./getNewMergeRecord.js");
 
 function checkForMergeConflicts(code) {
-    return branchCode.split("\n").find(line => {
+    return code.split("\n").find(line => {
         return line === "<<<<<<<<<" ||
                line === "=========" ||
                line === ">>>>>>>>>";

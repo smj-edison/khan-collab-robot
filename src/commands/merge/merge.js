@@ -26,8 +26,6 @@ function isKaidAuthorized(masterHeaders, kaid) {
  * @param {*} mergeId 
  */
 async function getRevisionCode(programHistory, mergeId) {
-    console.log(programHistory);
-
     const mergeRecord = programHistory.merges.find(mergeHistory => {
         return mergeHistory.mergeId === mergeId;
     });
