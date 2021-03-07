@@ -18,7 +18,7 @@ async function deleteBranch(branchId) {
     const branchJSON = await getProgramJSON(branchId);
 
     // the program that showed all the conflicts (aka the parent spinoff)
-    const conflictProgram = branchJSON.originScratchpad.id;
+    const conflictProgram = branchJSON.originScratchpadId;
 
     const {headers: conflictProgramHeaders} = await getProgramCodeAndHeaders(conflictProgram);
 
