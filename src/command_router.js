@@ -38,6 +38,7 @@ async function runCommand(cookies, text, kaid) {
             if(error.name === "CommandError") {
                 resolve(error.message);
             } else {
+                console.error(error);
                 resolve("An error occured. Try checking you command arguments?");
             }
         }).then(resolve);

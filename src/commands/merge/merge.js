@@ -26,6 +26,8 @@ function isKaidAuthorized(masterHeaders, kaid) {
  * @param {*} mergeId 
  */
 async function getRevisionCode(programHistory, mergeId) {
+    console.log(programHistory);
+
     const mergeRecord = programHistory.merges.find(mergeHistory => {
         return mergeHistory.mergeId === mergeId;
     });
@@ -37,7 +39,9 @@ async function getRevisionCode(programHistory, mergeId) {
             // if the merge record points to another program, load that one instead
             return (await getProgramJSON(mergeRecord.codePointer)).revision.code;
         }
-    }
+    } 
+
+    return "";
 }
 
 async function merge(cookies, args, kaid) {
@@ -62,7 +66,7 @@ async function merge(cookies, args, kaid) {
     }
 
     // calculate the merge
-    const originalCode = getRevisionCode(programHistory, branchHeaders.currentmergeid);
+    const originalCode = await getRevisionCode(programHistory, branchHeaders.currentmergeid);
 
     const mergeResult = calculateMerge(originalCode, masterCode, branchCode);
 

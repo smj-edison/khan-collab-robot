@@ -1,4 +1,4 @@
-const {getProgramJSON} = require("ka-api").programs;
+const {getProgramJSON, updateProgram, spinOffProgram} = require("ka-api").programs;
 
 const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = require("./program_header.js");
 
