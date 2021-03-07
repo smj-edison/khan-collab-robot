@@ -20,7 +20,9 @@ async function deleteBranch(branchId) {
     // the program that showed all the conflicts (aka the parent spinoff)
     const conflictProgram = branchJSON.originScratchpadId;
 
-    const {headers: conflictProgramHeaders} = await getProgramCodeAndHeaders(conflictProgram);
+    const {codeHeaders: conflictProgramHeaders} = await getProgramCodeAndHeaders(conflictProgram);
+
+    console.log(conflictProgramHeaders);
 
     // make sure that the program is actually conflicted, and not just trying to delete someone else's program
     if(conflictProgramHeaders.conflict === "true") {
