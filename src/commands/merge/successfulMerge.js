@@ -7,7 +7,7 @@ async function successfulMerge(cookies, programHistory, programBranchId, program
     // record the merge in the program history
     const newMergeRecord = getNewMergeRecord(newCode, programBranchId);
 
-    programHistory.push(newMergeRecord);
+    programHistory.merges.push(newMergeRecord);
     newHeaders.currentmergeid = newMergeRecord.mergeId;
 
     // update the program and history
