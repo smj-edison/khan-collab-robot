@@ -4,6 +4,7 @@ const uuidv4 = require("uuid").v4;
 const {spinOffProgramCodeAndHeaders} = require("../../metadata/programs.js");
 
 async function getNewMergeRecord(cookies, newCode, historyProgramId, programBranchId) {
+    // TODO: RENAME mergeId to revisionId everywhere
     const revisionId = uuidv4();
 
     const newProgramJSON = await spinOffProgramCodeAndHeaders(cookies, historyProgramId, {

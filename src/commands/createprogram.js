@@ -1,4 +1,4 @@
-const {newProgram, changeProgramHeaders} = require("../metadata/programs");
+const {updateProgramHeaders} = require("../metadata/programs");
 const {generateProgramHeaders} = require("../metadata/program_header");
 const PROGRAM_DEFAULT_JSON = require("../constants").PROGRAM_SAVE_JSON_DEFAULT;
 const yargs = require('yargs/yargs');
@@ -21,7 +21,7 @@ async function createprogram(args, kaid, cookies) {
     });
 
     // set the program's historyprogramid to the history program
-    await changeProgramHeaders(cookies, programResult.data.id, headers => {
+    await updateProgramHeaders(cookies, programResult.data.id, headers => {
         headers.historyprogramid = historyProgramResult.data.id;
     });
 

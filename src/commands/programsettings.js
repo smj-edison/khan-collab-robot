@@ -1,7 +1,8 @@
-const {updateProgram, getProgramCodeAndHeaders, getProgramJSON} = require("../programs");
-const {generateProgramHeaders} = require("../program_header");
-const PROGRAM_DEFAULT_JSON = require("../constants").PROGRAM_SAVE_JSON_DEFAULT;
-const {isAuthor} = require("../authorization.js");
+const {updateProgram, getProgramJSON} = require("ka-api").programs;
+const {getProgramCodeAndHeaders} = require("../metadata/programs");
+
+const {isAuthor} = require("../authorization/authorization.js");
+
 const yargs = require('yargs/yargs');
 
 async function programsettings(args, kaid, cookies) {

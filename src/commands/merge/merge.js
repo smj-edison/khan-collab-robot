@@ -1,7 +1,7 @@
 const {getProgramJSON} = require("ka-api").programs;
-const {updateProgramCodeAndHeaders, getProgramCodeAndHeaders, getProgramJSON} = require("../../metadata/programs.js");
+const {getProgramCodeAndHeaders} = require("../../metadata/programs.js");
 const {isAuthor, isContributor} = require("../../authorization/authorization");
-const {loadProgramHistory, updateProgramHistory} = require("../../metadata/program_history.js");
+const {loadProgramHistory} = require("../../metadata/program_history.js");
 
 const calculateMerge = require("./calculateMerge.js");
 const successfulMerge = require("./successfulMerge.js");

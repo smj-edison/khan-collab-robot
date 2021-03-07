@@ -1,6 +1,6 @@
-const {getCommentsOnComment, commentOnComment} = require("./comments");
+const {commentOnComment} = require("ka-api").discussion;
+
 const {runCommand} = require("../command_router");
-const {getState, modifyState} = require("../state");
 const {getAndParseNewNotifications} = require("../notifications/notifications.js");
 
 async function pollCommandsFromNotifications(cookies) {
@@ -21,6 +21,5 @@ async function pollCommandsFromNotifications(cookies) {
 }
 
 module.exports = {
-    pollCommands,
     pollCommandsFromNotifications
 };

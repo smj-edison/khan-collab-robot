@@ -1,9 +1,8 @@
 "use strict"
 
-const {login} = require("./session");
-const {updateProgram} = require("./programs");
-const {pollCommandsFromNotifications} = require("./poll_commands");
-const {checkForAndDeleteOldDiscussions} = require("./discussion_culling");
+const {login} = require("ka-api").auth;
+const {pollCommandsFromNotifications} = require("./src/polling/poll_commands.js");
+const {checkForAndDeleteOldDiscussions} = require("./src/cleanup/discussion_culling.js");
 
 let username = process.env.USERNAME;
 let password = process.env.PASSWORD;
