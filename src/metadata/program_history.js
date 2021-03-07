@@ -1,4 +1,6 @@
-const {getProgramJSON, updateProgram} = require("./programs")
+const {updateProgram} = require("ka-api").programs;
+
+const {getProgramJSON} = require("./programs");
 
 async function loadProgramHistory(programId) {
     const programJson = await getProgramJSON(programId);
