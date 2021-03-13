@@ -1,4 +1,5 @@
-const {getProgramCodeAndHeaders, deleteProgram} = require("../metadata/programs");
+const {deleteProgram} = require("ka-api").programs;
+const {getProgramCodeAndHeaders} = require("../metadata/programs");
 const {isAuthor} = require("../authorization/authorization.js");
 
 async function deleteprogram(cookies, args, kaid) {
