@@ -1,10 +1,11 @@
-const {updateProgram, getProgramCodeAndHeaders, getProgramJSON} = require("../programs");
-const {generateProgramHeaders} = require("../program_header");
-const PROGRAM_DEFAULT_JSON = require("../constants").PROGRAM_SAVE_JSON_DEFAULT;
-const {isAuthor} = require("../authorization.js");
+const {updateProgram, getProgramJSON} = require("ka-api").programs;
+const {getProgramCodeAndHeaders} = require("../metadata/programs");
+
+const {isAuthor} = require("../authorization/authorization.js");
+
 const yargs = require('yargs/yargs');
 
-async function programsettings(args, kaid, cookies) {
+async function programsettings(cookies, args, kaid) {
     var parsedArgs = yargs(args)
         .number("width").alias("w", "width")
         .number("height").alias("h", "height").argv;
@@ -15,9 +16,9 @@ async function programsettings(args, kaid, cookies) {
     }
 
     // make sure they own the program
-    const [headers, code] = await getProgramCodeAndHeaders(parsedArgs._[0]);
+    const {codeHeaders} = await getProgramCodeAndHeaders(parsedArgs._[0]);
 
-    if(!isAuthor(headers, kaid)) {
+    if(!isAuthor(codeHeaders, kaid)) {
         return "You are not authorized to do this.";
     }
     

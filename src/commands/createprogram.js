@@ -1,9 +1,11 @@
-const {newProgram, changeProgramHeaders} = require("../programs");
-const {generateProgramHeaders} = require("../program_header");
-const PROGRAM_DEFAULT_JSON = require("../constants").PROGRAM_SAVE_JSON_DEFAULT;
+const {newProgram} = require("ka-api").programs;
+
+const {updateProgramHeaders} = require("../metadata/programs");
+const {generateProgramHeaders} = require("../metadata/program_header");
+
 const yargs = require('yargs/yargs');
 
-async function createprogram(args, kaid, cookies) {
+async function createprogram(cookies, args, kaid) {
     var args = yargs(args)
         .choices("type", ["pjs", "webpage", "sql"]).alias("t", "type").default("type", "pjs").argv;
 
@@ -21,7 +23,7 @@ async function createprogram(args, kaid, cookies) {
     });
 
     // set the program's historyprogramid to the history program
-    await changeProgramHeaders(cookies, programResult.data.id, headers => {
+    await updateProgramHeaders(cookies, programResult.data.id, headers => {
         headers.historyprogramid = historyProgramResult.data.id;
     });
 

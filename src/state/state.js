@@ -1,5 +1,5 @@
 const fsp = require("fs").promises;
-const {STATE_FILE_LOCATION} = require("./constants.js");
+const {STATE_FILE_LOCATION} = require("../constants.js");
 const {lock} = require("proper-lockfile");
 
 /**

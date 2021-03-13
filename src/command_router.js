@@ -8,10 +8,10 @@ const test = require("./commands/test");
 const createprogram = require("./commands/createprogram");
 const deleteprogram = require("./commands/deleteprogram");
 const programsettings = require("./commands/programsettings.js");
-const merge = require("./commands/merge");
+const merge = require("./commands/merge/merge.js");
 const contrib = require("./commands/contrib");
 
-const CommandError = require("./command_error.js");
+const CommandError = require("./error/command_error.js");
 
 const routes = {
     test,
@@ -22,7 +22,7 @@ const routes = {
     contrib
 };
 
-async function runCommand(text, kaid, cookies) {
+async function runCommand(cookies, text, kaid) {
     return new Promise((resolve, reject) => {
         // TODO: parse commands better
         let args = text.split(" ");
@@ -32,12 +32,13 @@ async function runCommand(text, kaid, cookies) {
             return `The command ${command} does not exist.`;
         }
 
-        const commandResult = routes[command](args, kaid, cookies);
+        const commandResult = routes[command](cookies, args, kaid);
 
         return Promise.resolve(commandResult).catch(error => {
             if(error.name === "CommandError") {
                 resolve(error.message);
             } else {
+                console.error(error);
                 resolve("An error occured. Try checking you command arguments?");
             }
         }).then(resolve);

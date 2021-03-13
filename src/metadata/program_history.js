@@ -1,4 +1,6 @@
-const {getProgramJSON, updateProgram} = require("./programs")
+const {updateProgram} = require("ka-api").programs;
+
+const {getProgramJSON} = require("./programs");
 
 async function loadProgramHistory(programId) {
     const programJson = await getProgramJSON(programId);
@@ -7,7 +9,7 @@ async function loadProgramHistory(programId) {
 }
 
 async function updateProgramHistory(cookies, programId, json) {
-    await updateProgram(cookies, programId, JSON.stringify(json));
+    return await updateProgram(cookies, programId, JSON.stringify(json));
 }
 
 module.exports = {
