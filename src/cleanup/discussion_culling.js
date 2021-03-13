@@ -9,9 +9,7 @@ async function checkAndAddToQueue(programId, discussionParentExpandKey) {
         state.queuedDeletions = state.queuedDeletions ? state.queuedDeletions : [];
         
         // if it is already queued this thread, don't add it again
-        if(state.queuedDeletions.find(queuedDeletion => {
-            return queuedDeletion.discussionExpandKey === discussionParentExpandKey;
-        })) {
+        if(state.queuedDeletions.find(queuedDeletion => queuedDeletion.discussionExpandKey === discussionParentExpandKey)) {
             shouldComment = false;
             return;
         }
@@ -29,7 +27,8 @@ async function checkAndAddToQueue(programId, discussionParentExpandKey) {
 }
 
 async function checkAndMarkDiscussionOld(cookies, discussionLength, programId, discussionParentExpandKey) {
-    if(discussionLength > MAX_DISCUSSION_LENGTH) { 
+    if(discussionLength > MAX_DISCUSSION_LENGTH) {
+
         // will be set to false if it already scheduled the thread to be deleted
         let shouldAddWarnMessage = await checkAndAddToQueue(programId, discussionParentExpandKey);
 
@@ -41,6 +40,7 @@ async function checkAndMarkDiscussionOld(cookies, discussionLength, programId, d
         }
     }
 }
+
 
 function hasDiscussionExpired(queuedDeletion) {
     let queuedDate = new Date(queuedDeletion.date);
