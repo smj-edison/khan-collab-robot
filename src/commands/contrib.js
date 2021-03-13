@@ -6,11 +6,11 @@ const {CommandError} = require("../error/command_error.js");
 
 async function getKaidFromUsername(cookies, username) {
     return getProfileInfo(cookies, username).then(result => {
-        if(Object.is(result.data.data.user, null)) {
+        if(Object.is(result.data.user, null)) {
             throw new CommandError(`The username "${username}" does not exist. Make sure that you have the user's username and not their display name.`);
         }
 
-        return result.data.data.user.kaid;
+        return result.data.user.kaid;
     });
 }
 
