@@ -23,11 +23,11 @@ function isKaidAuthorized(masterHeaders, kaid) {
  * Search the program history for the right revision and return the code for that revision
  * 
  * @param {*} programHistory 
- * @param {*} mergeId 
+ * @param {*} revisionId 
  */
-async function getRevisionCode(programHistory, mergeId) {
+async function getRevisionCode(programHistory, revisionId) {
     const mergeRecord = programHistory.merges.find(mergeHistory => {
-        return mergeHistory.mergeId === mergeId;
+        return (mergeHistory.revisionId || mergeHistory.mergeId) === revisionId;
     });
 
     if(mergeRecord) {
@@ -64,7 +64,7 @@ async function merge(cookies, args, kaid) {
     }
 
     // calculate the merge
-    let originalCode = await getRevisionCode(programHistory, branchHeaders.currentmergeid);
+    let originalCode = await getRevisionCode(programHistory, branchHeaders.currentrevisionid || branchHeaders.currentmergeid);
     if(originalCode === "") originalCode = masterCode;
 
     const mergeResult = calculateMerge(originalCode, masterCode, branchCode);

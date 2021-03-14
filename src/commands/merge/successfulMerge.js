@@ -8,7 +8,7 @@ async function successfulMerge(cookies, programHistory, programBranchId, program
     const newMergeRecord = getNewMergeRecord(newCode, programBranchId);
 
     programHistory.merges.push(newMergeRecord);
-    newHeaders.currentmergeid = newMergeRecord.mergeId;
+    newHeaders.currentrevisionid = newMergeRecord.revisionId;
 
     // update the program and history
     await Promise.all([
