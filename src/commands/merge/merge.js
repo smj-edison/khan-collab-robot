@@ -60,7 +60,7 @@ async function merge(cookies, args, kaid) {
 
     // if it's resolving a conflict
     if(branchHeaders.conflict === "true") {
-        return await resolveConflictMerge(cookies, programHistory, programBranchId, programMasterId, masterHeaders, branchCode);
+        return await resolveConflictMerge(cookies, masterHeaders.historyprogramid, programHistory, programBranchId, programMasterId, masterHeaders, branchCode);
     }
 
     // calculate the merge
@@ -75,7 +75,7 @@ async function merge(cookies, args, kaid) {
     if(mergeResult.conflict) {
         return await conflictedMerge(cookies, programBranchId, newCode, newHeaders);
     } else {
-        return await successfulMerge(cookies, programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders);
+        return await successfulMerge(cookies, historyProgramId, programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders);
     }
 }
 
