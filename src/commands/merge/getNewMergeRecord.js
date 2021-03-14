@@ -24,13 +24,13 @@ async function getNewMergeRecord(cookies, newCode, historyProgramId, programBran
 */
 
 function getNewMergeRecord(newCode, programBranchId) {
-    const mergeId = uuidv4();
+    const revisionId = uuidv4();
 
     return {
         timestamp: Date.now(),
         code: newCode, 
         programId: programBranchId,
-        mergeId: mergeId
+        revisionId: revisionId
     };
 }
 

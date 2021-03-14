@@ -40,7 +40,7 @@ async function resolveConflictMerge(cookies, programHistory, programBranchId, pr
     const newMergeRecord = getNewMergeRecord(branchCode, programBranchId);
 
     programHistory.merges.push(newMergeRecord);
-    masterHeaders.currentmergeid = newMergeRecord.mergeId;
+    masterHeaders.currentrevisionid = newMergeRecord.revisionId;
 
     // update the program and history
     await Promise.all([
