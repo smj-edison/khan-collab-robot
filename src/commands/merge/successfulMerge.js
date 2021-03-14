@@ -3,9 +3,9 @@ const {updateProgramHistory} = require("../../metadata/program_history.js");
 
 const getNewMergeRecord = require("./getNewMergeRecord.js");
 
-async function successfulMerge(cookies, programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders) {
+async function successfulMerge(cookies, historyProgramId, programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders) {
     // record the merge in the program history
-    const newMergeRecord = getNewMergeRecord(newCode, programBranchId);
+    const newMergeRecord = await getNewMergeRecord(cookies, branchCode, historyProgramId, programBranchId);
 
     programHistory.merges.push(newMergeRecord);
     newHeaders.currentrevisionid = newMergeRecord.revisionId;
