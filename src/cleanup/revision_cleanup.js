@@ -33,8 +33,8 @@ async function getStaleRevisions(programId, codeHeaders, historyProgramResult) {
     revisionsToPreserve.add(codeHeaders.currentrevisionid); // don't remove the current revision ever
 
     // any revisions that don't need to be preserved should be considered stale
-    return historyProgramResult.merges.map(merge => merge.revisionId).filter(revisionId => {
-        return !revisionsToPreserve.has(revisionId);
+    return historyProgramResult.merges.filter(mergeRecord => {
+        return !mergeRecord.codeDeleted && !revisionsToPreserve.has(mergeRecord.revisionId);
     });
 }
 
