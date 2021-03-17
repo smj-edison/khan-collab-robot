@@ -5,7 +5,7 @@ const getNewMergeRecord = require("./getNewMergeRecord.js");
 
 async function successfulMerge(cookies, historyProgramId, programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders) {
     // record the merge in the program history
-    const newMergeRecord = await getNewMergeRecord(cookies, branchCode, historyProgramId, programBranchId);
+    const newMergeRecord = await getNewMergeRecord(cookies, newCode, historyProgramId, programBranchId);
 
     programHistory.merges.push(newMergeRecord);
     newHeaders.currentrevisionid = newMergeRecord.revisionId;
