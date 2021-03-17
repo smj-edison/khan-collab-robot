@@ -1,5 +1,6 @@
 const {updateProgramCodeAndHeaders} = require("../../metadata/programs.js");
 const {updateProgramHistory} = require("../../metadata/program_history.js");
+const {cleanupOldRevisions} = require("../../cleanup/revision_cleanup.js");
 
 const getNewMergeRecord = require("./getNewMergeRecord.js");
 
@@ -15,6 +16,9 @@ async function successfulMerge(cookies, historyProgramId, programHistory, progra
         updateProgramCodeAndHeaders(cookies, programMasterId, newHeaders, newCode),
         updateProgramHistory(cookies, masterHeaders.historyprogramid, programHistory)
     ]);
+
+    // clean up any unneeded code
+    await cleanupOldRevisions(cookies, programMasterId, newHeaders, programHistory);
 
     return "Your program was successfully merged.";
 }
