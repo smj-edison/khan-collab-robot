@@ -23,11 +23,11 @@ function isKaidAuthorized(masterHeaders, kaid) {
  * Search the program history for the right revision and return the code for that revision
  * 
  * @param {*} programHistory 
- * @param {*} mergeId 
+ * @param {*} revisionId 
  */
-async function getRevisionCode(programHistory, mergeId) {
+async function getRevisionCode(programHistory, revisionId) {
     const mergeRecord = programHistory.merges.find(mergeHistory => {
-        return mergeHistory.mergeId === mergeId;
+        return (mergeHistory.revisionId || mergeHistory.mergeId) === revisionId;
     });
 
     if(mergeRecord) {
@@ -60,11 +60,11 @@ async function merge(cookies, args, kaid) {
 
     // if it's resolving a conflict
     if(branchHeaders.conflict === "true") {
-        return await resolveConflictMerge(cookies, programHistory, programBranchId, programMasterId, masterHeaders, branchCode);
+        return await resolveConflictMerge(cookies, masterHeaders.historyprogramid, programHistory, programBranchId, programMasterId, masterHeaders, branchCode);
     }
 
     // calculate the merge
-    let originalCode = await getRevisionCode(programHistory, branchHeaders.currentmergeid);
+    let originalCode = await getRevisionCode(programHistory, branchHeaders.currentrevisionid || branchHeaders.currentmergeid);
     if(originalCode === "") originalCode = masterCode;
 
     const mergeResult = calculateMerge(originalCode, masterCode, branchCode);
@@ -75,7 +75,7 @@ async function merge(cookies, args, kaid) {
     if(mergeResult.conflict) {
         return await conflictedMerge(cookies, programBranchId, newCode, newHeaders);
     } else {
-        return await successfulMerge(cookies, programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders);
+        return await successfulMerge(cookies, masterHeaders.historyprogramid, programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders);
     }
 }
 

@@ -30,17 +30,17 @@ async function deleteBranch(cookies, branchId) {
     }
 }
 
-async function resolveConflictMerge(cookies, programHistory, programBranchId, programMasterId, masterHeaders, branchCode) {
+async function resolveConflictMerge(cookies, historyProgramId, programHistory, programBranchId, programMasterId, masterHeaders, branchCode) {
     // make sure there isn't any conflicted code in it
     if(checkForMergeConflicts(branchCode)) {
         return "You have not removed all conflicts. Remove all conflicts and try again.";
     }
 
     // record the merge in the program history
-    const newMergeRecord = getNewMergeRecord(branchCode, programBranchId);
+    const newMergeRecord = await getNewMergeRecord(cookies, branchCode, historyProgramId, programBranchId);
 
     programHistory.merges.push(newMergeRecord);
-    masterHeaders.currentmergeid = newMergeRecord.mergeId;
+    masterHeaders.currentrevisionid = newMergeRecord.revisionId;
 
     // update the program and history
     await Promise.all([
