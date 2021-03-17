@@ -1,5 +1,6 @@
-const {getSpinoffs, getProgramJSON} = require("ka-api").programs;
+const {getSpinoffs, deleteProgram} = require("ka-api").programs;
 const {getProgramCodeAndHeaders} = require("../metadata/programs.js");
+const {loadProgramHistory, updateProgramHistory} = require("../metadata/program_history.js");
 
 async function getStaleRevisions(programId, codeHeaders, historyProgramResult) {
     // first, list all the spinoffs of the main program (the branches)
@@ -19,7 +20,7 @@ async function getStaleRevisions(programId, codeHeaders, historyProgramResult) {
     const programsToKeep = spinoffKaids.filter(value => contributors.includes(value.kaid));
 
     // load all the programs to keep
-    const programs = await Promise.all(programsToKeep.map(program => getProgramCodeAndHeaders(program.programId)));
+    const programs = await Promise.all(programsToKeep.map(program => getProgramCodeAndHeaders(program.codePointer)));
     const programsHeaders = programs.map(program => program.codeHeaders);
 
     // make a array of all the revisions that still exist as spinoffs
@@ -37,8 +38,41 @@ async function getStaleRevisions(programId, codeHeaders, historyProgramResult) {
     });
 }
 
+async function cleanupOldRevisions(cookies, programId, codeHeaders=null, historyProgramResult=null) {
+    // get required resources if not provided
+    if(!codeHeaders) codeHeaders = (await getProgramCodeAndHeaders(programId)).codeHeaders;
+    if(!historyProgramResult) historyProgramResult = await loadProgramHistory(codeHeaders.historyprogramid);
 
+    // get all the stale revisions
+    const staleRevisions = await getStaleRevisions(programId, codeHeaders, historyProgramResult);
+
+    // delete all the stale revisions
+    const staleMergeRecords = historyProgramResult.merges.filter(merge => {
+        return staleRevisions.includes(merge.revisionId); // return the merge records that are stale
+    });
+
+    // delete the programs containing the stale code
+    const programsToDelete = staleMergeRecords.map(mergeRecord => mergeRecord.codePointer);
+    await Promise.all(programsToDelete.map(programToDelete => deleteProgram(cookies, programToDelete)));
+
+    // now clean up bad pointers
+    historyProgramResult.merges = historyProgramResult.merges.map(mergeRecord => {
+        if(staleRevisions.includes(mergeRecord.revisionId)) { // if this merge record is stale
+            // mark it as such
+            mergeRecord.codePointer = null;
+            mergeRecord.codeDeleted = true;
+        }
+
+        return mergeRecord;
+    });
+
+    // update the code headers
+    await updateProgramHistory(cookies, codeHeaders.historyprogramid, historyProgramResult);
+
+    return staleRevisions; // return the revisions removed
+}
 
 module.exports = {
-    getStaleRevisions
+    getStaleRevisions,
+    cleanupOldRevisions
 };
