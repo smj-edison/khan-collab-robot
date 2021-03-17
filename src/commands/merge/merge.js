@@ -64,7 +64,7 @@ async function merge(cookies, args, kaid) {
     }
 
     // calculate the merge
-    const originalCode = await getRevisionCode(programHistory, branchHeaders.currentmergeid);
+    let originalCode = await getRevisionCode(programHistory, branchHeaders.currentmergeid);
     if(originalCode === "") originalCode = masterCode;
 
     const mergeResult = calculateMerge(originalCode, masterCode, branchCode);
