@@ -20,7 +20,7 @@ async function getStaleRevisions(programId, codeHeaders, historyProgramResult) {
     const programsToKeep = spinoffKaids.filter(value => contributors.includes(value.kaid));
 
     // load all the programs to keep
-    const programs = await Promise.all(programsToKeep.map(program => getProgramCodeAndHeaders(program.codePointer)));
+    const programs = await Promise.all(programsToKeep.map(program => getProgramCodeAndHeaders(program.programId)));
     const programsHeaders = programs.map(program => program.codeHeaders);
 
     // make a array of all the revisions that still exist as spinoffs
