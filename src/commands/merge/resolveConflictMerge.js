@@ -1,4 +1,3 @@
-const axios = require("axios");
 const {getProgramJSON, deleteProgram} = require("ka-api").programs;
 
 const {CommandError} = require("../../error/command_error.js");

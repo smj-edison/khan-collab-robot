@@ -1,3 +1,5 @@
+const {getProgramJSON} = require("ka-api").programs;
+
 const {updateProgramCodeAndHeaders} = require("../../metadata/programs.js");
 const {updateProgramHistory} = require("../../metadata/program_history.js");
 const {cleanupOldRevisions} = require("../../cleanup/revision_cleanup.js");
