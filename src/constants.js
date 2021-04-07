@@ -13,9 +13,8 @@ const TIME_UNTIL_DELETED = 1000 * 60 * 60 * 24;
 const NEW_COMMENT_TEXT = "" +
 `*Post commands in the comments here*
 
-Tutorial is here: https://www.khanacademy.org/computer-programming/-/5972816126492672
-
-Documentation is here: https://www.khanacademy.org/computer-programming/-/4624919749345280`;
+If you have any problems, post a message in the \`bug reports\` thread.
+Documentation and tutorial is in the program above.`;
 
 const STATE_FILE_LOCATION = "state.json";
 
