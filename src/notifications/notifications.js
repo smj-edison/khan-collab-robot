@@ -18,7 +18,8 @@ async function parseNotificationJSON(notifJson) {
             value: notifJson.content,
             kaid: post.authorKaid,
             programId: programId,
-            postsInDiscussion: posts.length
+            postsInDiscussion: posts.length,
+            date: notifJson.date
         };
     }
 
@@ -30,7 +31,7 @@ async function parseNotifications(notifications) {
     return parsedNotifs = (await Promise.all(notifications.map(parseNotificationJSON))).filter(notif => notif !== null);
 }
 
-async function parseNotificationsAndCleanup(notifications) {
+async function parseNotificationsAndCleanup(cookies, notifications) {
     const clearNotifPromise = clearBrandNewNotifications(cookies);
 
     const parsedNotifs = await parseNotifications(notifications);
@@ -49,7 +50,7 @@ async function parseNotificationsAndCleanup(notifications) {
 async function getAndParseBrandNewNotifications(cookies) {
     const notifications = await getAllBrandNewNotifications(cookies);
     
-    return await parseNotificationsAndCleanup(notifications);
+    return await parseNotificationsAndCleanup(cookies, notifications);
 }
 
 async function getAndParseNewNotificationsAfterDate(cookies, date) {
@@ -59,7 +60,7 @@ async function getAndParseNewNotificationsAfterDate(cookies, date) {
         return notifDate > date; // the comment should be after the date
     });
     
-    return await parseNotificationsAndCleanup(notifications);
+    return await parseNotificationsAndCleanup(cookies, notifications);
 }
 
 module.exports = {
