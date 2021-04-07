@@ -1,10 +1,13 @@
+const axios = require("axios");
 const {getProgramJSON, deleteProgram} = require("ka-api").programs;
 
 const {CommandError} = require("../../error/command_error.js");
 const {updateProgramCodeAndHeaders, getProgramCodeAndHeaders} = require("../../metadata/programs.js");
 const {updateProgramHistory} = require("../../metadata/program_history.js");
+const {cleanupOldRevisions} = require("../../cleanup/revision_cleanup.js");
 
 const getNewMergeRecord = require("./getNewMergeRecord.js");
+const getPngBase64FromUrl = require("./getPngBase64FromUrl.js");
 
 function checkForMergeConflicts(code) {
     return code.split("\n").find(line => {
@@ -14,9 +17,7 @@ function checkForMergeConflicts(code) {
     });
 }
 
-async function deleteBranch(cookies, branchId) {
-    const branchJSON = await getProgramJSON(branchId);
-
+async function deleteBranch(cookies, branchJSON) {
     // the program that showed all the conflicts (aka the parent spinoff)
     const conflictProgram = branchJSON.originScratchpadId;
 
@@ -42,13 +43,24 @@ async function resolveConflictMerge(cookies, historyProgramId, programHistory, p
     programHistory.merges.push(newMergeRecord);
     masterHeaders.currentrevisionid = newMergeRecord.revisionId;
 
+    const branchJSON = await getProgramJSON(programBranchId);
+
+    const branchThumbnail = await getPngBase64FromUrl(branchJSON.imageUrl); // use the image from the spinoff
+
     // update the program and history
     await Promise.all([
-        updateProgramCodeAndHeaders(cookies, programMasterId, masterHeaders, branchCode),
+        updateProgramCodeAndHeaders(cookies, programMasterId, masterHeaders, branchCode, {
+            revision: {
+                image_url: branchThumbnail
+            }
+        }),
         updateProgramHistory(cookies, masterHeaders.historyprogramid, programHistory)
     ]);
 
-    await deleteBranch(cookies, programBranchId);
+    await deleteBranch(cookies, branchJSON);
+
+    // clean up any unneeded code
+    await cleanupOldRevisions(cookies, programMasterId, newHeaders, programHistory);
 
     return `Conflict successfully resolved. Be sure to delete https://khanacademy.org/computer-programming/_/${programBranchId}`;
 }
