@@ -1,4 +1,4 @@
-const {getAllBrandNewNotifications, clearBrandNewNotifications} = require("ka-api").notifications;
+const {getAllBrandNewNotifications, clearBrandNewNotifications, getNotificationsUntil} = require("ka-api").notifications;
 const {getNotificationCommentDetails} = require("ka-api").notifications;
 const {checkAndMarkDiscussionOld} = require("../cleanup/discussion_culling.js");
 
