@@ -38,11 +38,39 @@ async function addContributor(cookies, args, kaid) {
     return newContributor + " added as a contributor.";
 }
 
+async function removeContributor(cookies, args, kaid) {
+    const contributorToRemove = args[0];
+    const programId = args[1];
+
+    const contributorToRemoveKaid = await getKaidFromUsername(cookies, contributorToRemove);
+    const {codeHeaders, code} = await getProgramCodeAndHeaders(programId);
+
+    if(!isAuthor(codeHeaders, kaid)) {
+        return "You are not the author. You cannot add contributors.";
+    }
+
+    let contributors = codeHeaders.contributors ? codeHeaders.contributors.split(",") : [];
+
+    if(!contributors.includes(contributorToRemoveKaid)) {
+        return `${contributorToRemove} is not a contributor.`; 
+        
+    } else {
+        contributors = contributors.filter(contributor => contributor !== contributorToRemoveKaid);
+    }
+
+    codeHeaders.contributors = contributors.join(",");
+
+    await updateProgramCodeAndHeaders(cookies, programId, codeHeaders, code);
+
+    return contributorToRemove + " removed as a contributor.";
+}
+
 async function contrib(cookies, args, kaid) {
     switch(args[0]) {
         case "add":
             return addContributor(cookies, args.slice(1), kaid);
-        break;
+        case "remove":
+            return removeContributor(cookies, args.slice(1), kaid);
     }
 }
 
