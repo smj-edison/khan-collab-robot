@@ -1,4 +1,4 @@
-const {getAllBrandNewNotifications, clearBrandNewNotifications} = require("ka-api").notifications;
+const {getAllBrandNewNotifications, clearBrandNewNotifications, getNotificationsUntil} = require("ka-api").notifications;
 const {getNotificationCommentDetails} = require("ka-api").notifications;
 const {checkAndMarkDiscussionOld} = require("../cleanup/discussion_culling.js");
 
@@ -18,19 +18,23 @@ async function parseNotificationJSON(notifJson) {
             value: notifJson.content,
             kaid: post.authorKaid,
             programId: programId,
-            postsInDiscussion: posts.length
+            postsInDiscussion: posts.length,
+            date: notifJson.date
         };
     }
 
     return null;
 }
 
-async function getAndParseNewNotifications(cookies) {
-    const notifications = await getAllBrandNewNotifications(cookies);
+async function parseNotifications(notifications) {
+    // parsing has to make get requests to read the notifications, so the map is promisified
+    return parsedNotifs = (await Promise.all(notifications.map(parseNotificationJSON))).filter(notif => notif !== null);
+}
+
+async function parseNotificationsAndCleanup(cookies, notifications) {
     const clearNotifPromise = clearBrandNewNotifications(cookies);
 
-    // parsing has to make get requests to read the notifications, so the map is promisified
-    const parsedNotifs = (await Promise.all(notifications.map(parseNotificationJSON))).filter(notif => notif !== null);
+    const parsedNotifs = await parseNotifications(notifications);
 
     await Promise.all(parsedNotifs.map(async notif => {
         // clean up long discussions TODO: move to a more transparent place
@@ -40,8 +44,26 @@ async function getAndParseNewNotifications(cookies) {
     await clearNotifPromise; // make sure the notifications are cleared
 
     return parsedNotifs;
+
+}
+
+async function getAndParseBrandNewNotifications(cookies) {
+    const notifications = await getAllBrandNewNotifications(cookies);
+    
+    return await parseNotificationsAndCleanup(cookies, notifications);
+}
+
+async function getAndParseNewNotificationsAfterDate(cookies, date) {
+    const notifications = await getNotificationsUntil(cookies, notif => {
+        const notifDate = new Date(notif.date);
+
+        return notifDate > date; // the comment should be after the date
+    });
+    
+    return await parseNotificationsAndCleanup(cookies, notifications);
 }
 
 module.exports = {
-    getAndParseNewNotifications
+    getAndParseBrandNewNotifications,
+    getAndParseNewNotificationsAfterDate
 };
