@@ -35,7 +35,7 @@ async function getRevisionCode(programHistory, revisionId) {
             return mergeRecord.code;
         } else if(mergeRecord.codePointer) {
             // if the merge record points to another program, load that one instead
-            return (await getProgramJSON(mergeRecord.codePointer)).revision.code;
+            return (await getProgramCodeAndHeaders(mergeRecord.codePointer).code);
         }
     } 
 
