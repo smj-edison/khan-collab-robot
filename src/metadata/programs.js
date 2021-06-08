@@ -4,17 +4,18 @@ const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = requi
 
 const deepmerge = require("deepmerge");
 
-async function getProgramCodeAndHeaders(id) {
+async function getProgramCodeAndHeaders(id, type) {
     const program = await getProgramJSON(id);
 
     const codeRaw = program.revision.code;
 
-    const codeHeaders = parseProgramHeaders(codeRaw, program.userAuthoredContentType);
-    const code = stripProgramHeaders(codeRaw, program.userAuthoredContentType);
+    const codeHeaders = parseProgramHeaders(codeRaw, type || program.userAuthoredContentType);
+    const code = stripProgramHeaders(codeRaw, type || program.userAuthoredContentType);
 
     return {
         codeHeaders,
-        code
+        code,
+        json: program
     };
 }
 

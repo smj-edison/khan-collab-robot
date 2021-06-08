@@ -25,7 +25,7 @@ function isKaidAuthorized(masterHeaders, kaid) {
  * @param {*} programHistory 
  * @param {*} revisionId 
  */
-async function getRevisionCode(programHistory, revisionId) {
+async function getRevisionCode(programHistory, revisionId, masterProgramType) {
     const mergeRecord = programHistory.merges.find(mergeHistory => {
         return (mergeHistory.revisionId || mergeHistory.mergeId) === revisionId;
     });
@@ -35,7 +35,7 @@ async function getRevisionCode(programHistory, revisionId) {
             return mergeRecord.code;
         } else if(mergeRecord.codePointer) {
             // if the merge record points to another program, load that one instead
-            return (await getProgramCodeAndHeaders(mergeRecord.codePointer).code);
+            return (await getProgramCodeAndHeaders(mergeRecord.codePointer, masterProgramType)).code;
         }
     } 
 
@@ -47,7 +47,7 @@ async function merge(cookies, args, kaid) {
 
     // get headers and code for branch and master programs
     let {codeHeaders: branchHeaders, code: branchCode} = await getProgramCodeAndHeaders(programBranchId);
-    let {codeHeaders: masterHeaders, code: masterCode} = await getProgramCodeAndHeaders(programMasterId);
+    let {codeHeaders: masterHeaders, code: masterCode, json: masterJson} = await getProgramCodeAndHeaders(programMasterId);
 
     // load the master's program history
     let programHistory = await loadProgramHistory(masterHeaders.historyprogramid);
@@ -64,7 +64,7 @@ async function merge(cookies, args, kaid) {
     }
 
     // calculate the merge
-    let originalCode = await getRevisionCode(programHistory, branchHeaders.currentrevisionid || branchHeaders.currentmergeid);
+    let originalCode = await getRevisionCode(programHistory, branchHeaders.currentrevisionid || branchHeaders.currentmergeid, masterJson.userAuthoredContentType);
     if(originalCode === "") originalCode = masterCode;
 
     const mergeResult = calculateMerge(originalCode, masterCode, branchCode);
