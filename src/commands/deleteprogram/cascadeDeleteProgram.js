@@ -1,16 +1,7 @@
-const {getSpinoffs, deleteProgram} = require("ka-api").programs;
-const {getProgramCodeAndHeaders} = require("../metadata/programs");
-const {isAuthor} = require("../authorization/authorization.js");
+const {getProgramCodeAndHeaders} = require("../../metadata/programs");
 
-async function deleteprogram(cookies, args, kaid) {
-    const programId = args[0];
-
-    let {codeHeaders} = await getProgramCodeAndHeaders(programId);
-
-    // make sure they have permission
-    if(!isAuthor(codeHeaders, kaid)) {
-        return "You are not authorized to do this.";
-    }
+async function cascadeDeleteProgram(cookies, programId, codeHeaders) {
+    let codeHeaders = codeHeaders || (await getProgramCodeAndHeaders(programId));
 
     // get all the history program's spinoffs (by bors)
     const codeRevisionProgramsToDelete = (await getSpinoffs(codeHeaders.historyprogramid)).scratchpads.filter(spinoff => {
@@ -23,8 +14,6 @@ async function deleteprogram(cookies, args, kaid) {
         deleteProgram(cookies, programId),
         deleteProgram(cookies, codeHeaders.historyprogramid)
     ].concat(revisionsDeletePromises));
-
-    return "Successfully deleted program.";
 }
 
-module.exports = deleteprogram;
+module.exports = cascadeDeleteProgram;

@@ -6,7 +6,7 @@
 
 const test = require("./commands/test");
 const createprogram = require("./commands/createprogram");
-const deleteprogram = require("./commands/deleteprogram");
+const deleteprogram = require("./commands/deleteprogram/deleteprogram");
 const programsettings = require("./commands/programsettings.js");
 const merge = require("./commands/merge/merge.js");
 const contrib = require("./commands/contrib");

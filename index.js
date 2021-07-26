@@ -3,6 +3,7 @@
 const {login} = require("ka-api").auth;
 const {pollCommandsFromNotifications} = require("./src/polling/poll_commands.js");
 const {checkForAndDeleteOldDiscussions} = require("./src/cleanup/discussion_culling.js");
+const scanFlags = require("./src/moderation/scan-flags.js");
 
 let username = process.env.USERNAME;
 let password = process.env.PASSWORD;
@@ -26,4 +27,8 @@ let _ = (async function() {
     setInterval(() => {
         checkForNewCommands(cookies);
     }, 1000 * 10);
+
+    setInterval(() => {
+        scanFlags(cookies);
+    }, 1000 * 60 * 60);
 })();
