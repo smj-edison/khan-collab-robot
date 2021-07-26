@@ -1,7 +1,7 @@
 const {getProgramCodeAndHeaders} = require("../../metadata/programs");
 
 async function cascadeDeleteProgram(cookies, programId, codeHeaders) {
-    let codeHeaders = codeHeaders || (await getProgramCodeAndHeaders(programId));
+    codeHeaders = codeHeaders || (await getProgramCodeAndHeaders(programId));
 
     // get all the history program's spinoffs (by bors)
     const codeRevisionProgramsToDelete = (await getSpinoffs(codeHeaders.historyprogramid)).scratchpads.filter(spinoff => {
