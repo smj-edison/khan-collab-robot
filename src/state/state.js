@@ -31,7 +31,7 @@ async function setState(json) {
  * @param {function} lambdaThatWillModifyState A lambda that should modify the state
  */
 async function modifyState(lambdaThatWillModifyState) {
-    return lock(STATE_FILE_LOCATION)
+    return lock(STATE_FILE_LOCATION, {retries: 10})
             .then(async function(release) {
                 //get the state, modify it, and save it again
                 let state = await getState();

@@ -2,17 +2,20 @@ const {getProgramJSON, updateProgram, spinOffProgram} = require("ka-api").progra
 
 const {parseProgramHeaders, generateProgramHeaders, stripProgramHeaders} = require("./program_header.js");
 
-async function getProgramCodeAndHeaders(id) {
+const deepmerge = require("deepmerge");
+
+async function getProgramCodeAndHeaders(id, type) {
     const program = await getProgramJSON(id);
 
     const codeRaw = program.revision.code;
 
-    const codeHeaders = parseProgramHeaders(codeRaw, program.userAuthoredContentType);
-    const code = stripProgramHeaders(codeRaw, program.userAuthoredContentType);
+    const codeHeaders = parseProgramHeaders(codeRaw, type || program.userAuthoredContentType);
+    const code = stripProgramHeaders(codeRaw, type || program.userAuthoredContentType);
 
     return {
         codeHeaders,
-        code
+        code,
+        json: program
     };
 }
 
@@ -24,10 +27,18 @@ async function updateProgramCodeAndHeaders(cookies, programId, codeHeaders, code
     return updateProgram(cookies, programId, codeWithHeaders, settings, programJson);
 }
 
-async function spinOffProgramCodeAndHeaders(cookies, originalProgramId, codeHeaders, code, settings={}) {
+async function spinOffProgramCodeAndHeaders(cookies, originalProgramId, codeHeaders, code, settings={}, type) {
     const originalProgramJson = await getProgramJSON(originalProgramId);
+    type = type || originalProgramJson.userAuthoredContentType;
 
-    const codeWithHeaders = code + "\n" + generateProgramHeaders(codeHeaders, originalProgramJson.userAuthoredContentType);
+    const codeWithHeaders = code + "\n" + generateProgramHeaders(codeHeaders, type);
+
+    settings = deepmerge({
+        userAuthoredContentType: type,
+        revision: {
+            editor_type: "ace_" + type
+        }
+    }, settings);
 
     return spinOffProgram(cookies, originalProgramId, codeWithHeaders, settings, originalProgramJson);
 }

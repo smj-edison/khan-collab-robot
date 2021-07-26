@@ -8,8 +8,10 @@ const getNewMergeRecord = require("./getNewMergeRecord.js");
 const getPngBase64FromUrl = require("./getPngBase64FromUrl.js");
 
 async function successfulMerge(cookies, historyProgramId, programHistory, programBranchId, programMasterId, masterHeaders, newCode, newHeaders) {
+    const programMasterType = (await getProgramJSON(programMasterId)).userAuthoredContentType;
+    
     // record the merge in the program history
-    const newMergeRecord = await getNewMergeRecord(cookies, newCode, historyProgramId, programBranchId);
+    const newMergeRecord = await getNewMergeRecord(cookies, newCode, historyProgramId, programBranchId, programMasterType);
 
     programHistory.merges.push(newMergeRecord);
     newHeaders.currentrevisionid = newMergeRecord.revisionId;
