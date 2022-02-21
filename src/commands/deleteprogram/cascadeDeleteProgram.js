@@ -1,4 +1,5 @@
 const {getProgramCodeAndHeaders} = require("../../metadata/programs");
+const {getSpinoffs, deleteProgram} = require("ka-api").programs;
 
 async function cascadeDeleteProgram(cookies, programId, codeHeaders) {
     codeHeaders = codeHeaders || (await getProgramCodeAndHeaders(programId));
