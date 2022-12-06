@@ -12,7 +12,7 @@
     "ka-api": "github:smj-edison/ka-api",
     "node-diff3": "^2.1.1",
     "proper-lockfile": "^4.1.2",
-    "qs": "^6.10.1",
+    "qs": "^6.10.3",
     "uuid": "^7.0.3",
     "yargs": "^16.2.0"
   },
